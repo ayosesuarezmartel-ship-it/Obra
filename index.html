@@ -3,191 +3,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eléctricas Centro S.L - Gestión</title>
+    <title>Gestión Eléctricas Centro S.L</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #007bff;
-            --success: #28a745;
-            --danger: #dc3545;
-            --warning: #ffc107;
-            --bg: #f4f6f9;
-            --white: #ffffff;
-            --text: #2d3436;
-            --gray: #636e72;
+            --primary: #2563eb; --primary-dark: #1e40af;
+            --success: #10b981; --danger: #ef4444;
+            --warning: #f59e0b; --bg: #f8fafc;
+            --white: #ffffff; --text-main: #1e293b;
+            --text-muted: #64748b; --radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
-        body { font-family: 'Segoe UI', system-ui, sans-serif; padding: 15px; background-color: var(--bg); color: var(--text); line-height: 1.4; }
-        .container { max-width: 600px; margin: auto; background: var(--white); padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        
-        .header-empresa { text-align: center; border-bottom: 2px solid var(--primary); margin-bottom: 15px; padding-bottom: 10px; }
-        .header-empresa h1 { margin: 0; font-size: 1.5em; color: var(--text); }
-        .header-empresa p { color: var(--gray); margin: 2px 0 0; font-size: 0.75em; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text-main); margin: 0; padding: 20px; }
+        .container { max-width: 500px; margin: auto; }
 
-        .stats-panel { display: flex; gap: 10px; margin-bottom: 15px; }
-        .stat-card { flex: 1; padding: 8px; border-radius: 6px; text-align: center; color: white; font-size: 0.85em; }
-        .stat-curso { background-color: var(--warning); color: #856404; }
-        .stat-realizada { background-color: var(--success); }
-        .stat-number { display: block; font-size: 1.3em; font-weight: bold; }
+        /* HEADER */
+        .header { text-align: center; margin-bottom: 20px; }
+        .header h1 { font-size: 1.5rem; color: var(--primary); margin: 0; }
 
-        /* FORMULARIO COMPACTO */
-        .form-group { 
-            margin-bottom: 20px; 
-            display: grid; 
-            grid-template-columns: 1fr auto; 
-            border: 1px solid #dfe6e9;
-            border-radius: 6px;
-            overflow: hidden;
-            background: white;
+        /* PANTALLAS */
+        .pantalla { display: none; }
+        .pantalla.activa { display: block; }
+
+        /* TARJETAS RESUMEN (LISTADO) */
+        .card-resumen {
+            background: var(--white);
+            padding: 18px;
+            border-radius: var(--radius);
+            margin-bottom: 12px;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            border: 1px solid #e2e8f0;
+            transition: transform 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        .form-group input { border: none; padding: 10px 12px; font-size: 0.9em; outline: none; width: 100%; }
-        .form-group .btn-main { border: none; padding: 0 15px; font-weight: bold; background: var(--primary); color: white; cursor: pointer; font-size: 0.85em; }
+        .card-resumen:hover { transform: scale(1.02); border-color: var(--primary); }
+        .info-obra h3 { margin: 0; font-size: 1.1rem; }
+        .badge-progreso { background: #eff6ff; color: var(--primary); padding: 4px 8px; border-radius: 6px; font-weight: bold; font-size: 0.8rem; }
 
-        /* TARJETAS DE OBRA COMPACTAS */
-        .obra-card { border: 1px solid #dfe6e9; padding: 15px; margin-top: 15px; border-radius: 8px; position: relative; background: var(--white); }
-        .obra-finalizada { border-left: 5px solid var(--success); background-color: #f9fffb; }
+        /* VISTA DETALLE (SUBPANTALLA) */
+        .btn-volver { 
+            background: none; border: none; color: var(--primary); 
+            font-weight: bold; cursor: pointer; margin-bottom: 15px; 
+            display: flex; align-items: center; gap: 5px; padding: 0;
+        }
+        .detalle-header { border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 15px; }
         
-        .obra-card h3 { margin: 0 30px 5px 0; font-size: 1.1em; display: flex; align-items: center; }
+        /* ESTILOS DE FORMULARIOS Y TAREAS */
+        .form-group { display: flex; gap: 8px; margin-bottom: 20px; }
+        .form-group input { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #ddd; outline: none; }
+        .btn-add { background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; }
         
-        .progress-container { background-color: #eee; border-radius: 4px; height: 6px; width: 100%; margin: 8px 0 4px 0; overflow: hidden; }
-        .progress-bar { background-color: var(--success); height: 100%; width: 0%; transition: width 0.4s; }
+        .tarea-item { background: white; padding: 10px; border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .completada { text-decoration: line-through; color: var(--text-muted); opacity: 0.6; }
+        
+        textarea { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; box-sizing: border-box; font-family: inherit; margin-bottom: 15px; background: #fffdf2; }
 
-        .comentario-obra { width: 100%; margin: 10px 0; padding: 6px; border: 1px solid #edf2f7; border-radius: 4px; background: #fffdf2; font-size: 0.8em; resize: none; font-family: inherit; }
-        
-        .tarea-bloque { margin-bottom: 6px; }
-        .tarea-item { display: flex; align-items: center; gap: 8px; background: #fdfdfd; padding: 5px 8px; border-radius: 4px; border: 1px solid #f1f2f6; font-size: 0.9em; }
-        .completada { text-decoration: line-through; color: var(--gray); opacity: 0.7; }
-        
-        .nota-tarea { display: block; font-size: 0.75em; color: var(--gray); margin: 2px 0 0 28px; border: none; background: transparent; font-style: italic; width: 85%; }
-
-        .sub-form { margin-top: 12px; display: flex; gap: 5px; padding-top: 10px; border-top: 1px solid #f1f2f6; }
-        .sub-form input { flex-grow: 1; padding: 6px; font-size: 0.85em; border: 1px solid #eee; border-radius: 4px; }
-        .btn-add-task { background: var(--success); color: white; border: none; border-radius: 4px; width: 30px; height: 30px; cursor: pointer; font-weight: bold; }
-        
-        .btn-edit { background: none; border: none; color: #b2bec3; font-size: 0.8em; cursor: pointer; margin-left: 5px; }
-        .btn-del { color: #fab1a0; background: none; border: none; font-size: 1.1em; position: absolute; top: 12px; right: 12px; cursor: pointer; }
-        .btn-del:hover { color: var(--danger); }
+        .btn-delete-obra { color: var(--danger); background: none; border: none; cursor: pointer; font-size: 0.8rem; margin-top: 20px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header-empresa">
-        <h1>⚡ CONTROL DE OBRAS</h1>
-        <p></p>
+    <div class="header">
+        <h1>⚡ Eléctricas Centro</h1>
     </div>
 
-    <div class="stats-panel">
-        <div class="stat-card stat-curso">
-            <span class="stat-number" id="countCurso">0</span> En curso
+    <div id="pantallaListado" class="pantalla activa">
+        <div class="form-group">
+            <input type="text" id="nuevoNombreObra" placeholder="Nombre de obra o cliente...">
+            <button class="btn-add" onclick="crearObra()">AÑADIR</button>
         </div>
-        <div class="stat-card stat-realizada">
-            <span class="stat-number" id="countRealizadas">0</span> Realizadas
-        </div>
+        <div id="listaObras"></div>
     </div>
 
-    <div class="form-group">
-        <input type="text" id="nombreObra" placeholder="Nueva obra o cliente...">
-        <button class="btn-main" onclick="agregarObra()">AÑADIR</button>
+    <div id="pantallaDetalle" class="pantalla">
+        <button class="btn-volver" onclick="irAListado()">← Volver al listado</button>
+        <div id="contenidoDetalle"></div>
     </div>
-
-    <div id="contenedorObras"></div>
 </div>
 
 <script>
-    let obras = JSON.parse(localStorage.getItem('obras_v_slim')) || [];
+    let obras = JSON.parse(localStorage.getItem('obras_v_sub')) || [];
+    let idObraActual = null;
 
-    function guardarYRenderizar() {
-        localStorage.setItem('obras_v_slim', JSON.stringify(obras));
-        renderizar();
+    // --- NAVEGACIÓN ---
+    function irADetalle(id) {
+        idObraActual = id;
+        document.getElementById('pantallaListado').classList.remove('activa');
+        document.getElementById('pantallaDetalle').classList.add('activa');
+        renderDetalle();
     }
 
-    function agregarObra() {
-        const input = document.getElementById('nombreObra');
-        const nombre = input.value.trim();
-        if (!nombre) return;
-        obras.push({ id: Date.now(), nombre: nombre, tareas: [], comentario: "" });
+    function irAListado() {
+        idObraActual = null;
+        document.getElementById('pantallaDetalle').classList.remove('activa');
+        document.getElementById('pantallaListado').classList.add('activa');
+        renderListado();
+    }
+
+    // --- LÓGICA DE DATOS ---
+    function guardar() {
+        localStorage.setItem('obras_v_sub', JSON.stringify(obras));
+    }
+
+    function crearObra() {
+        const input = document.getElementById('nuevoNombreObra');
+        if (!input.value.trim()) return;
+        const nueva = { id: Date.now(), nombre: input.value, tareas: [], notas: "" };
+        obras.push(nueva);
         input.value = '';
-        guardarYRenderizar();
+        guardar();
+        renderListado();
     }
 
-    function editarObra(idObra) {
-        const obra = obras.find(o => o.id === idObra);
-        const nuevo = prompt("Nombre:", obra.nombre);
-        if (nuevo && nuevo.trim()) { obra.nombre = nuevo.trim(); guardarYRenderizar(); }
+    function borrarObra(id) {
+        if(confirm("¿Eliminar toda la obra?")) {
+            obras = obras.filter(o => o.id !== id);
+            guardar();
+            irAListado();
+        }
     }
 
-    function eliminarObra(idObra) {
-        if(confirm("¿Eliminar obra?")) { obras = obras.filter(o => o.id !== idObra); guardarYRenderizar(); }
-    }
-
-    function actualizarComentarioObra(idObra, texto) {
-        const obra = obras.find(o => o.id === idObra);
-        obra.comentario = texto;
-        localStorage.setItem('obras_v_slim', JSON.stringify(obras));
-    }
-
-    function agregarTarea(idObra) {
-        const input = document.getElementById(`input-tarea-${idObra}`);
-        const texto = input.value.trim();
-        if (!texto) return;
-        const obra = obras.find(o => o.id === idObra);
-        obra.tareas.push({ id: Date.now(), texto: texto, realizada: false, nota: "" });
-        input.value = '';
-        guardarYRenderizar();
-    }
-
-    function toggleTarea(idObra, idTarea) {
-        const obra = obras.find(o => o.id === idObra);
-        const tarea = obra.tareas.find(t => t.id === idTarea);
-        tarea.realizada = !tarea.realizada;
-        guardarYRenderizar();
-    }
-
-    function actualizarNotaTarea(idObra, idTarea, texto) {
-        const obra = obras.find(o => o.id === idObra);
-        const tarea = obra.tareas.find(t => t.id === idTarea);
-        tarea.nota = texto;
-        localStorage.setItem('obras_v_slim', JSON.stringify(obras));
-    }
-
-    function renderizar() {
-        const contenedor = document.getElementById('contenedorObras');
+    // --- RENDERIZADO ---
+    function renderListado() {
+        const contenedor = document.getElementById('listaObras');
         contenedor.innerHTML = '';
-        let rTotal = 0, cTotal = 0;
-
         obras.forEach(obra => {
-            const totalT = obra.tareas.length;
-            const hechasT = obra.tareas.filter(t => t.realizada).length;
-            const porcentaje = totalT === 0 ? 0 : Math.round((hechasT / totalT) * 100);
-            const hecha = totalT > 0 && hechasT === totalT;
-            hecha ? rTotal++ : cTotal++;
-
-            const tareasHTML = obra.tareas.map(t => `
-                <div class="tarea-bloque">
-                    <div class="tarea-item">
-                        <input type="checkbox" ${t.realizada ? 'checked' : ''} onchange="toggleTarea(${obra.id}, ${t.id})">
-                        <span class="${t.realizada ? 'completada' : ''}">${t.texto}</span>
-                    </div>
-                    <input type="text" class="nota-tarea" placeholder="Nota..." value="${t.nota || ''}" onblur="actualizarNotaTarea(${obra.id}, ${t.id}, this.value)">
-                </div>`).join('');
+            const hechas = obra.tareas.filter(t => t.hecha).length;
+            const total = obra.tareas.length;
+            const porc = total === 0 ? 0 : Math.round((hechas/total)*100);
 
             contenedor.innerHTML += `
-                <div class="obra-card ${hecha ? 'obra-finalizada' : ''}">
-                    <button class="btn-del" onclick="eliminarObra(${obra.id})">✕</button>
-                    <h3>${obra.nombre} <button class="btn-edit" onclick="editarObra(${obra.id})">✏️</button></h3>
-                    <div class="progress-container"><div class="progress-bar" style="width: ${porcentaje}%"></div></div>
-                    <textarea class="comentario-obra" rows="1" placeholder="Notas de obra..." onblur="actualizarComentarioObra(${obra.id}, this.value)">${obra.comentario || ''}</textarea>
-                    <div>${tareasHTML || '<p style="color:gray; font-size:0.75em;">Sin tareas.</p>'}</div>
-                    <div class="sub-form">
-                        <input type="text" id="input-tarea-${obra.id}" placeholder="Nueva tarea...">
-                        <button class="btn-add-task" onclick="agregarTarea(${obra.id})">+</button>
+                <div class="card-resumen" onclick="irADetalle(${obra.id})">
+                    <div class="info-obra">
+                        <h3>${obra.nombre}</h3>
+                        <small style="color:var(--text-muted)">${total} tareas asignadas</small>
                     </div>
+                    <div class="badge-progreso">${porc}%</div>
                 </div>`;
         });
-        document.getElementById('countCurso').innerText = cTotal;
-        document.getElementById('countRealizadas').innerText = rTotal;
     }
-    renderizar();
+
+    function renderDetalle() {
+        const obra = obras.find(o => o.id === idObraActual);
+        const contenedor = document.getElementById('contenidoDetalle');
+        
+        const tareasHTML = obra.tareas.map(t => `
+            <div class="tarea-item">
+                <input type="checkbox" ${t.hecha ? 'checked' : ''} onchange="toggleTarea(${t.id})">
+                <span class="${t.hecha ? 'completada' : ''}">${t.texto}</span>
+            </div>
+        `).join('');
+
+        contenedor.innerHTML = `
+            <div class="detalle-header">
+                <h2>${obra.nombre}</h2>
+            </div>
+            
+            <label><small>NOTAS GENERALES:</small></label>
+            <textarea rows="3" placeholder="Dirección, contacto, materiales..." onblur="actualizarNotas(this.value)">${obra.notas}</textarea>
+
+            <div class="form-group">
+                <input type="text" id="nuevaTareaInput" placeholder="Añadir tarea específica...">
+                <button class="btn-add" onclick="agregarTarea()">+</button>
+            </div>
+
+            <div class="lista-tareas-detalle">${tareasHTML || '<p>No hay tareas.</p>'}</div>
+
+            <button class="btn-delete-obra" onclick="borrarObra(${obra.id})">⚠️ Eliminar esta obra permanentemente</button>
+        `;
+    }
+
+    // --- ACCIONES DENTRO DE OBRA ---
+    function agregarTarea() {
+        const input = document.getElementById('nuevaTareaInput');
+        if (!input.value.trim()) return;
+        const obra = obras.find(o => o.id === idObraActual);
+        obra.tareas.push({ id: Date.now(), texto: input.value, hecha: false });
+        input.value = '';
+        guardar();
+        renderDetalle();
+    }
+
+    function toggleTarea(idTarea) {
+        const obra = obras.find(o => o.id === idObraActual);
+        const tarea = obra.tareas.find(t => t.id === idTarea);
+        tarea.hecha = !tarea.hecha;
+        guardar();
+        renderDetalle();
+    }
+
+    function actualizarNotas(valor) {
+        const obra = obras.find(o => o.id === idObraActual);
+        obra.notas = valor;
+        guardar();
+    }
+
+    // Inicializar
+    renderListado();
 </script>
 </body>
 </html>
