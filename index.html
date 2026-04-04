@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión Eléctricas Centro S.L</title>
+    <title>Gestión Pro - Eléctricas Centro S.L</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -18,79 +18,87 @@
         body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text-main); margin: 0; padding: 20px; }
         .container { max-width: 500px; margin: auto; }
 
-        /* HEADER */
         .header { text-align: center; margin-bottom: 20px; }
-        .header h1 { font-size: 1.5rem; color: var(--primary); margin: 0; }
+        .header h1 { font-size: 1.6rem; color: var(--primary); margin: 0; }
+
+        /* CONTADORES PRINCIPALES */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .stat-box { background: white; padding: 15px; border-radius: var(--radius); text-align: center; box-shadow: var(--shadow); border-bottom: 4px solid #ddd; }
+        .stat-box span { display: block; font-size: 1.4rem; font-weight: 800; }
+        .stat-box small { color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.7rem; }
+        .box-curso { border-color: var(--warning); }
+        .box-fin { border-color: var(--success); }
 
         /* PANTALLAS */
         .pantalla { display: none; }
         .pantalla.activa { display: block; }
 
-        /* TARJETAS RESUMEN (LISTADO) */
+        /* LISTADO */
         .card-resumen {
-            background: var(--white);
-            padding: 18px;
-            border-radius: var(--radius);
-            margin-bottom: 12px;
-            box-shadow: var(--shadow);
-            cursor: pointer;
-            border: 1px solid #e2e8f0;
-            transition: transform 0.2s;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            background: var(--white); padding: 18px; border-radius: var(--radius);
+            margin-bottom: 12px; box-shadow: var(--shadow); cursor: pointer;
+            border: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;
         }
-        .card-resumen:hover { transform: scale(1.02); border-color: var(--primary); }
-        .info-obra h3 { margin: 0; font-size: 1.1rem; }
-        .badge-progreso { background: #eff6ff; color: var(--primary); padding: 4px 8px; border-radius: 6px; font-weight: bold; font-size: 0.8rem; }
+        .card-resumen:hover { border-color: var(--primary); background: #f0f7ff; }
 
-        /* VISTA DETALLE (SUBPANTALLA) */
-        .btn-volver { 
-            background: none; border: none; color: var(--primary); 
-            font-weight: bold; cursor: pointer; margin-bottom: 15px; 
-            display: flex; align-items: center; gap: 5px; padding: 0;
-        }
-        .detalle-header { border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 15px; }
-        
-        /* ESTILOS DE FORMULARIOS Y TAREAS */
-        .form-group { display: flex; gap: 8px; margin-bottom: 20px; }
-        .form-group input { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #ddd; outline: none; }
-        .btn-add { background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; }
-        
-        .tarea-item { background: white; padding: 10px; border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .completada { text-decoration: line-through; color: var(--text-muted); opacity: 0.6; }
-        
-        textarea { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; box-sizing: border-box; font-family: inherit; margin-bottom: 15px; background: #fffdf2; }
+        /* SUBPANTALLA DETALLE */
+        .btn-volver { background: none; border: none; color: var(--primary); font-weight: bold; cursor: pointer; margin-bottom: 15px; padding: 0; }
+        .seccion-titulo { font-size: 0.9rem; font-weight: 800; color: var(--text-muted); margin: 20px 0 10px 0; display: block; border-bottom: 1px solid #e2e8f0; }
 
-        .btn-delete-obra { color: var(--danger); background: none; border: none; cursor: pointer; font-size: 0.8rem; margin-top: 20px; }
+        /* FORMULARIOS */
+        .form-mini { display: flex; gap: 5px; margin-bottom: 15px; }
+        .form-mini input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-size: 0.9rem; }
+        .btn-add { background: var(--primary); color: white; border: none; padding: 0 15px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .btn-add-mat { background: var(--success); }
+
+        /* ITEMS (TAREAS Y MATERIALES) */
+        .item-row { background: white; padding: 10px; border-radius: 8px; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .item-row span { flex: 1; font-size: 0.95rem; }
+        .btn-del-small { background: none; border: none; color: #ccc; cursor: pointer; font-size: 0.9rem; }
+        .btn-del-small:hover { color: var(--danger); }
+        .completada { text-decoration: line-through; color: var(--text-muted); opacity: 0.5; }
+
+        textarea { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; box-sizing: border-box; font-family: inherit; background: #fffdf2; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <h1>⚡ Eléctricas Centro</h1>
+        <h1>⚡ CONTROL DE OBRAS</h1>
     </div>
 
     <div id="pantallaListado" class="pantalla activa">
-        <div class="form-group">
+        <div class="stats-grid">
+            <div class="stat-box box-curso">
+                <span id="numCurso">0</span>
+                <small>En curso</small>
+            </div>
+            <div class="stat-box box-fin">
+                <span id="numFin">0</span>
+                <small>Finalizadas</small>
+            </div>
+        </div>
+
+        <div class="form-mini">
             <input type="text" id="nuevoNombreObra" placeholder="Nombre de obra o cliente...">
-            <button class="btn-add" onclick="crearObra()">AÑADIR</button>
+            <button class="btn-add" onclick="crearObra()">CREAR</button>
         </div>
         <div id="listaObras"></div>
     </div>
 
     <div id="pantallaDetalle" class="pantalla">
-        <button class="btn-volver" onclick="irAListado()">← Volver al listado</button>
+        <button class="btn-volver" onclick="irAListado()">← VOLVER AL LISTADO</button>
         <div id="contenidoDetalle"></div>
     </div>
 </div>
 
 <script>
-    let obras = JSON.parse(localStorage.getItem('obras_v_sub')) || [];
+    let obras = JSON.parse(localStorage.getItem('obras_v_final')) || [];
     let idObraActual = null;
 
-    // --- NAVEGACIÓN ---
+    function guardar() { localStorage.setItem('obras_v_final', JSON.stringify(obras)); }
+
     function irADetalle(id) {
         idObraActual = id;
         document.getElementById('pantallaListado').classList.remove('activa');
@@ -105,47 +113,41 @@
         renderListado();
     }
 
-    // --- LÓGICA DE DATOS ---
-    function guardar() {
-        localStorage.setItem('obras_v_sub', JSON.stringify(obras));
-    }
-
     function crearObra() {
         const input = document.getElementById('nuevoNombreObra');
         if (!input.value.trim()) return;
-        const nueva = { id: Date.now(), nombre: input.value, tareas: [], notas: "" };
-        obras.push(nueva);
+        obras.push({ id: Date.now(), nombre: input.value, tareas: [], materiales: [], notas: "" });
         input.value = '';
         guardar();
         renderListado();
     }
 
-    function borrarObra(id) {
-        if(confirm("¿Eliminar toda la obra?")) {
-            obras = obras.filter(o => o.id !== id);
-            guardar();
-            irAListado();
-        }
-    }
-
-    // --- RENDERIZADO ---
     function renderListado() {
         const contenedor = document.getElementById('listaObras');
+        let enCurso = 0, finalizadas = 0;
         contenedor.innerHTML = '';
+
         obras.forEach(obra => {
             const hechas = obra.tareas.filter(t => t.hecha).length;
             const total = obra.tareas.length;
             const porc = total === 0 ? 0 : Math.round((hechas/total)*100);
+            
+            // Lógica de contadores
+            (total > 0 && hechas === total) ? finalizadas++ : enCurso++;
 
             contenedor.innerHTML += `
                 <div class="card-resumen" onclick="irADetalle(${obra.id})">
-                    <div class="info-obra">
-                        <h3>${obra.nombre}</h3>
-                        <small style="color:var(--text-muted)">${total} tareas asignadas</small>
+                    <div>
+                        <strong style="display:block">${obra.nombre}</strong>
+                        <small style="color:var(--text-muted)">${obra.materiales.length} materiales registrados</small>
                     </div>
-                    <div class="badge-progreso">${porc}%</div>
+                    <div style="text-align:right">
+                        <span style="font-weight:800; color:var(--primary)">${porc}%</span>
+                    </div>
                 </div>`;
         });
+        document.getElementById('numCurso').innerText = enCurso;
+        document.getElementById('numFin').innerText = finalizadas;
     }
 
     function renderDetalle() {
@@ -153,57 +155,79 @@
         const contenedor = document.getElementById('contenidoDetalle');
         
         const tareasHTML = obra.tareas.map(t => `
-            <div class="tarea-item">
+            <div class="item-row">
                 <input type="checkbox" ${t.hecha ? 'checked' : ''} onchange="toggleTarea(${t.id})">
                 <span class="${t.hecha ? 'completada' : ''}">${t.texto}</span>
-            </div>
-        `).join('');
+                <button class="btn-del-small" onclick="borrarItem('tareas', ${t.id})">✕</button>
+            </div>`).join('');
+
+        const materialesHTML = obra.materiales.map(m => `
+            <div class="item-row" style="border-left: 4px solid var(--success)">
+                <span>${m.texto}</span>
+                <button class="btn-del-small" onclick="borrarItem('materiales', ${m.id})">✕</button>
+            </div>`).join('');
 
         contenedor.innerHTML = `
-            <div class="detalle-header">
-                <h2>${obra.nombre}</h2>
-            </div>
+            <h2 style="margin:0">${obra.nombre}</h2>
             
-            <label><small>NOTAS GENERALES:</small></label>
-            <textarea rows="3" placeholder="Dirección, contacto, materiales..." onblur="actualizarNotas(this.value)">${obra.notas}</textarea>
+            <span class="seccion-titulo">NOTAS Y UBICACIÓN</span>
+            <textarea rows="2" onblur="actualizarNotas(this.value)">${obra.notas}</textarea>
 
-            <div class="form-group">
-                <input type="text" id="nuevaTareaInput" placeholder="Añadir tarea específica...">
-                <button class="btn-add" onclick="agregarTarea()">+</button>
+            <span class="seccion-titulo">LISTA DE TAREAS</span>
+            <div class="form-mini">
+                <input type="text" id="inTarea" placeholder="Nueva tarea...">
+                <button class="btn-add" onclick="agregarItem('tareas', 'inTarea')">+</button>
             </div>
+            <div>${tareasHTML || '<small>Sin tareas</small>'}</div>
 
-            <div class="lista-tareas-detalle">${tareasHTML || '<p>No hay tareas.</p>'}</div>
+            <span class="seccion-titulo">MATERIALES UTILIZADOS</span>
+            <div class="form-mini">
+                <input type="text" id="inMat" placeholder="Ej: Tubo corrugado 20m...">
+                <button class="btn-add btn-add-mat" onclick="agregarItem('materiales', 'inMat')">+</button>
+            </div>
+            <div>${materialesHTML || '<small>Sin materiales</small>'}</div>
 
-            <button class="btn-delete-obra" onclick="borrarObra(${obra.id})">⚠️ Eliminar esta obra permanentemente</button>
+            <button style="margin-top:30px; color:var(--danger); background:none; border:none; cursor:pointer; font-size:0.7rem" onclick="borrarObra(${obra.id})">ELIMINAR ESTA OBRA</button>
         `;
     }
 
-    // --- ACCIONES DENTRO DE OBRA ---
-    function agregarTarea() {
-        const input = document.getElementById('nuevaTareaInput');
-        if (!input.value.trim()) return;
+    function agregarItem(tipo, inputId) {
+        const val = document.getElementById(inputId).value.trim();
+        if (!val) return;
         const obra = obras.find(o => o.id === idObraActual);
-        obra.tareas.push({ id: Date.now(), texto: input.value, hecha: false });
-        input.value = '';
+        obra[tipo].push({ id: Date.now(), texto: val, hecha: false });
         guardar();
         renderDetalle();
     }
 
-    function toggleTarea(idTarea) {
+    function borrarItem(tipo, idItem) {
         const obra = obras.find(o => o.id === idObraActual);
-        const tarea = obra.tareas.find(t => t.id === idTarea);
-        tarea.hecha = !tarea.hecha;
+        obra[tipo] = obra[tipo].filter(i => i.id !== idItem);
         guardar();
         renderDetalle();
     }
 
-    function actualizarNotas(valor) {
+    function toggleTarea(idT) {
         const obra = obras.find(o => o.id === idObraActual);
-        obra.notas = valor;
+        const t = obra.tareas.find(x => x.id === idT);
+        t.hecha = !t.hecha;
         guardar();
+        renderDetalle();
     }
 
-    // Inicializar
+    function actualizarNotas(v) { 
+        obras.find(o => o.id === idObraActual).notas = v; 
+        guardar(); 
+    }
+
+    function borrarObra(id) { 
+        if(confirm("¿Borrar obra?")) { 
+            obras = obras.filter(o => o.id !== id); 
+            guardar(); 
+            irAListado(); 
+        } 
+    }
+
     renderListado();
 </script>
 </body>
