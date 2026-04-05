@@ -7,12 +7,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #2563eb; --primary-dark: #1e40af;
-            --success: #10b981; --danger: #ef4444;
-            --warning: #f59e0b; --bg: #f8fafc;
-            --white: #ffffff; --text-main: #1e293b;
-            --text-muted: #64748b; --radius: 12px;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --primary: #3b82f6; /* Azul más brillante para fondo oscuro */
+            --primary-dark: #2563eb;
+            --success: #10b981; 
+            --danger: #ef4444;
+            --warning: #f59e0b; 
+            --bg: #0f172a; /* Fondo azul noche muy oscuro */
+            --card-bg: #1e293b; /* Fondo de tarjetas */
+            --white: #ffffff; 
+            --text-main: #f1f5f9; /* Texto claro */
+            --text-muted: #94a3b8; /* Texto secundario gris */
+            --radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --border: #334155;
         }
 
         body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text-main); margin: 0; padding: 20px; }
@@ -22,12 +29,21 @@
         .header h1 { font-size: 1.6rem; color: var(--primary); margin: 0; }
 
         /* CONTADORES PRINCIPALES */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .stat-box { background: white; padding: 15px; border-radius: var(--radius); text-align: center; box-shadow: var(--shadow); border-bottom: 4px solid #ddd; }
-        .stat-box span { display: block; font-size: 1.4rem; font-weight: 800; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .stat-box { background: var(--card-bg); padding: 15px; border-radius: var(--radius); text-align: center; box-shadow: var(--shadow); border-bottom: 4px solid #475569; }
+        .stat-box span { display: block; font-size: 1.4rem; font-weight: 800; color: var(--white); }
         .stat-box small { color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.7rem; }
         .box-curso { border-color: var(--warning); }
         .box-fin { border-color: var(--success); }
+
+        /* FILTROS */
+        .filtros-container { display: flex; gap: 8px; margin-bottom: 20px; }
+        .btn-filtro { 
+            flex: 1; padding: 10px; border: 1px solid var(--border); background: var(--card-bg); 
+            border-radius: 8px; cursor: pointer; font-size: 0.75rem; font-weight: 700; 
+            color: var(--text-muted); transition: all 0.2s;
+        }
+        .btn-filtro.activo { background: var(--primary); color: white; border-color: var(--primary); }
 
         /* PANTALLAS */
         .pantalla { display: none; }
@@ -35,37 +51,41 @@
 
         /* LISTADO */
         .card-resumen {
-            background: var(--white); padding: 18px; border-radius: var(--radius);
+            background: var(--card-bg); padding: 18px; border-radius: var(--radius);
             margin-bottom: 12px; box-shadow: var(--shadow); cursor: pointer;
-            border: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;
+            border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;
         }
-        .card-resumen:hover { border-color: var(--primary); background: #f0f7ff; }
+        .card-resumen:hover { border-color: var(--primary); background: #1e293b; }
 
         /* SUBPANTALLA DETALLE */
         .btn-volver { background: none; border: none; color: var(--primary); font-weight: bold; cursor: pointer; margin-bottom: 15px; padding: 0; }
-        .seccion-titulo { font-size: 0.9rem; font-weight: 800; color: var(--text-muted); margin: 20px 0 10px 0; display: block; border-bottom: 1px solid #e2e8f0; }
+        .seccion-titulo { font-size: 0.9rem; font-weight: 800; color: var(--text-muted); margin: 20px 0 10px 0; display: block; border-bottom: 1px solid var(--border); }
 
         /* FORMULARIOS */
         .form-mini { display: flex; gap: 5px; margin-bottom: 15px; }
-        .form-mini input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-size: 0.9rem; }
+        .form-mini input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border); font-size: 0.9rem; background: #334155; color: white; }
+        .form-mini input::placeholder { color: #94a3b8; }
         .btn-add { background: var(--primary); color: white; border: none; padding: 0 15px; border-radius: 8px; cursor: pointer; font-weight: bold; }
         .btn-add-mat { background: var(--success); }
 
         /* ITEMS (TAREAS Y MATERIALES) */
-        .item-row { background: white; padding: 10px; border-radius: 8px; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        .item-row span { flex: 1; font-size: 0.95rem; }
-        .btn-del-small { background: none; border: none; color: #ccc; cursor: pointer; font-size: 0.9rem; }
+        .item-row { background: var(--card-bg); padding: 10px; border-radius: 8px; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.2); border: 1px solid var(--border); }
+        .item-row span { flex: 1; font-size: 0.95rem; color: var(--text-main); }
+        .btn-del-small { background: none; border: none; color: #64748b; cursor: pointer; font-size: 0.9rem; }
         .btn-del-small:hover { color: var(--danger); }
         .completada { text-decoration: line-through; color: var(--text-muted); opacity: 0.5; }
 
-        textarea { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; box-sizing: border-box; font-family: inherit; background: #fffdf2; }
+        textarea { width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 10px; box-sizing: border-box; font-family: inherit; background: #1e293b; color: #fff; }
+        
+        /* Checkbox personalizado para que pegue con el diseño */
+        input[type="checkbox"] { transform: scale(1.2); cursor: pointer; accent-color: var(--success); }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <h1>⚡CONTROL DE OBRAS⚡</h1>
+        <h1>CONTROL DE OBRAS</h1>
     </div>
 
     <div id="pantallaListado" class="pantalla activa">
@@ -80,8 +100,14 @@
             </div>
         </div>
 
+        <div class="filtros-container">
+            <button class="btn-filtro activo" id="btn-todas" onclick="cambiarFiltro('todas')">TODAS</button>
+            <button class="btn-filtro" id="btn-curso" onclick="cambiarFiltro('curso')">EN CURSO</button>
+            <button class="btn-finalizadas btn-filtro" id="btn-finalizadas" onclick="cambiarFiltro('finalizadas')">FINALIZADAS</button>
+        </div>
+
         <div class="form-mini">
-            <input type="text" id="nuevoNombreObra" placeholder="Nombre de obra o cliente...">
+            <input type="text" id="nuevoNombreObra" placeholder="Nueva obra o cliente...">
             <button class="btn-add" onclick="crearObra()">CREAR</button>
         </div>
         <div id="listaObras"></div>
@@ -96,8 +122,16 @@
 <script>
     let obras = JSON.parse(localStorage.getItem('obras_v_final')) || [];
     let idObraActual = null;
+    let filtroActual = 'todas';
 
     function guardar() { localStorage.setItem('obras_v_final', JSON.stringify(obras)); }
+
+    function cambiarFiltro(f) {
+        filtroActual = f;
+        document.querySelectorAll('.btn-filtro').forEach(b => b.classList.remove('activo'));
+        document.getElementById('btn-' + f).classList.add('activo');
+        renderListado();
+    }
 
     function irADetalle(id) {
         idObraActual = id;
@@ -127,27 +161,36 @@
         let enCurso = 0, finalizadas = 0;
         contenedor.innerHTML = '';
 
-        obras.forEach(obra => {
+        const filtradas = obras.filter(o => {
+            const hechas = o.tareas.filter(t => t.hecha).length;
+            const total = o.tareas.length;
+            const esFin = (total > 0 && hechas === total);
+            esFin ? finalizadas++ : enCurso++;
+
+            if (filtroActual === 'curso') return !esFin;
+            if (filtroActual === 'finalizadas') return esFin;
+            return true;
+        });
+
+        document.getElementById('numCurso').innerText = enCurso;
+        document.getElementById('numFin').innerText = finalizadas;
+
+        filtradas.forEach(obra => {
             const hechas = obra.tareas.filter(t => t.hecha).length;
             const total = obra.tareas.length;
             const porc = total === 0 ? 0 : Math.round((hechas/total)*100);
             
-            // Lógica de contadores
-            (total > 0 && hechas === total) ? finalizadas++ : enCurso++;
-
             contenedor.innerHTML += `
                 <div class="card-resumen" onclick="irADetalle(${obra.id})">
                     <div>
                         <strong style="display:block">${obra.nombre}</strong>
-                        <small style="color:var(--text-muted)">${obra.materiales.length} materiales registrados</small>
+                        <small style="color:var(--text-muted)">${obra.materiales.length} materiales</small>
                     </div>
                     <div style="text-align:right">
                         <span style="font-weight:800; color:var(--primary)">${porc}%</span>
                     </div>
                 </div>`;
         });
-        document.getElementById('numCurso').innerText = enCurso;
-        document.getElementById('numFin').innerText = finalizadas;
     }
 
     function renderDetalle() {
@@ -168,51 +211,46 @@
             </div>`).join('');
 
         contenedor.innerHTML = `
-            <h2 style="margin:0">${obra.nombre}</h2>
+            <h2 style="margin:0; color:var(--white)">${obra.nombre}</h2>
             
             <span class="seccion-titulo">NOTAS Y UBICACIÓN</span>
-            <textarea rows="2" onblur="actualizarNotas(this.value)">${obra.notas}</textarea>
+            <textarea rows="3" onblur="actualizarNotas(this.value)">${obra.notas}</textarea>
 
-            <span class="seccion-titulo">LISTA DE TAREAS</span>
+            <span class="seccion-titulo">TAREAS</span>
             <div class="form-mini">
-                <input type="text" id="inTarea" placeholder="Nueva tarea...">
+                <input type="text" id="inTarea" placeholder="Añadir tarea...">
                 <button class="btn-add" onclick="agregarItem('tareas', 'inTarea')">+</button>
             </div>
-            <div>${tareasHTML || '<small>Sin tareas</small>'}</div>
+            <div>${tareasHTML || '<small style="color:var(--text-muted)">Sin tareas</small>'}</div>
 
-            <span class="seccion-titulo">MATERIALES UTILIZADOS</span>
+            <span class="seccion-titulo">MATERIALES</span>
             <div class="form-mini">
-                <input type="text" id="inMat" placeholder="Ej: Tubo corrugado 20m...">
+                <input type="text" id="inMat" placeholder="Añadir material...">
                 <button class="btn-add btn-add-mat" onclick="agregarItem('materiales', 'inMat')">+</button>
             </div>
-            <div>${materialesHTML || '<small>Sin materiales</small>'}</div>
+            <div>${materialesHTML || '<small style="color:var(--text-muted)">Sin materiales</small>'}</div>
 
-            <button style="margin-top:30px; color:var(--danger); background:none; border:none; cursor:pointer; font-size:0.7rem" onclick="borrarObra(${obra.id})">ELIMINAR ESTA OBRA</button>
+            <button style="margin-top:40px; color:var(--danger); background:none; border:none; cursor:pointer; font-size:0.75rem; width:100%; text-align:center" onclick="borrarObra(${obra.id})">ELIMINAR ESTA OBRA PERMANENTEMENTE</button>
         `;
     }
 
-    function agregarItem(tipo, inputId) {
-        const val = document.getElementById(inputId).value.trim();
-        if (!val) return;
-        const obra = obras.find(o => o.id === idObraActual);
-        obra[tipo].push({ id: Date.now(), texto: val, hecha: false });
-        guardar();
-        renderDetalle();
+    function agregarItem(tipo, idIn) {
+        const val = document.getElementById(idIn).value.trim();
+        if(!val) return;
+        obras.find(o => o.id === idObraActual)[tipo].push({ id: Date.now(), texto: val, hecha: false });
+        guardar(); renderDetalle();
     }
 
-    function borrarItem(tipo, idItem) {
+    function borrarItem(tipo, id) {
         const obra = obras.find(o => o.id === idObraActual);
-        obra[tipo] = obra[tipo].filter(i => i.id !== idItem);
-        guardar();
-        renderDetalle();
+        obra[tipo] = obra[tipo].filter(i => i.id !== id);
+        guardar(); renderDetalle();
     }
 
-    function toggleTarea(idT) {
-        const obra = obras.find(o => o.id === idObraActual);
-        const t = obra.tareas.find(x => x.id === idT);
+    function toggleTarea(id) {
+        const t = obras.find(o => o.id === idObraActual).tareas.find(x => x.id === id);
         t.hecha = !t.hecha;
-        guardar();
-        renderDetalle();
+        guardar(); renderDetalle();
     }
 
     function actualizarNotas(v) { 
@@ -221,10 +259,9 @@
     }
 
     function borrarObra(id) { 
-        if(confirm("¿Borrar obra?")) { 
+        if(confirm("¿Seguro que quieres borrar la obra?")) { 
             obras = obras.filter(o => o.id !== id); 
-            guardar(); 
-            irAListado(); 
+            guardar(); irAListado(); 
         } 
     }
 
