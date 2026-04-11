@@ -7,263 +7,243 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #3b82f6; /* Azul más brillante para fondo oscuro */
-            --primary-dark: #2563eb;
-            --success: #10b981; 
-            --danger: #ef4444;
-            --warning: #f59e0b; 
-            --bg: #0f172a; /* Fondo azul noche muy oscuro */
-            --card-bg: #1e293b; /* Fondo de tarjetas */
-            --white: #ffffff; 
-            --text-main: #f1f5f9; /* Texto claro */
-            --text-muted: #94a3b8; /* Texto secundario gris */
-            --radius: 12px;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-            --border: #334155;
+            --primary: #2563eb; --success: #10b981; --danger: #ef4444;
+            --warning: #f59e0b; --bg: #f8fafc; --white: #ffffff;
+            --text-main: #1e293b; --text-muted: #64748b; --radius: 12px;
         }
 
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text-main); margin: 0; padding: 20px; }
+        @media (prefers-color-scheme: dark) {
+            :root { --bg: #0f172a; --white: #1e293b; --text-main: #f8fafc; --text-muted: #94a3b8; }
+            input, textarea, select { background: #1e293b; color: white; border-color: #334155 !important; }
+            .card-resumen, .tarea-contenedor { background: #1e293b !important; border-color: #334155 !important; }
+        }
+
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text-main); margin: 0; padding: 15px; }
         .container { max-width: 500px; margin: auto; }
+        
+        .header h1 { text-align: center; font-size: 1.5rem; color: var(--primary); margin-bottom: 20px; }
 
-        .header { text-align: center; margin-bottom: 20px; }
-        .header h1 { font-size: 1.6rem; color: var(--primary); margin: 0; }
+        /* LISTADO PRINCIPAL */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .stat-box { background: var(--white); padding: 12px; border-radius: var(--radius); text-align: center; border-bottom: 4px solid #ddd; }
+        .stat-box span { display: block; font-size: 1.2rem; font-weight: 800; }
+        .stat-box small { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
 
-        /* CONTADORES PRINCIPALES */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
-        .stat-box { background: var(--card-bg); padding: 15px; border-radius: var(--radius); text-align: center; box-shadow: var(--shadow); border-bottom: 4px solid #475569; }
-        .stat-box span { display: block; font-size: 1.4rem; font-weight: 800; color: var(--white); }
-        .stat-box small { color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.7rem; }
-        .box-curso { border-color: var(--warning); }
-        .box-fin { border-color: var(--success); }
-
-        /* FILTROS */
-        .filtros-container { display: flex; gap: 8px; margin-bottom: 20px; }
-        .btn-filtro { 
-            flex: 1; padding: 10px; border: 1px solid var(--border); background: var(--card-bg); 
-            border-radius: 8px; cursor: pointer; font-size: 0.75rem; font-weight: 700; 
-            color: var(--text-muted); transition: all 0.2s;
-        }
-        .btn-filtro.activo { background: var(--primary); color: white; border-color: var(--primary); }
+        .card-resumen { background: var(--white); padding: 15px; border-radius: var(--radius); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #e2e8f0; cursor: pointer; }
+        .obra-terminada { opacity: 0.6; background: #f1f5f9 !important; }
 
         /* PANTALLAS */
         .pantalla { display: none; }
         .pantalla.activa { display: block; }
 
-        /* LISTADO */
-        .card-resumen {
-            background: var(--card-bg); padding: 18px; border-radius: var(--radius);
-            margin-bottom: 12px; box-shadow: var(--shadow); cursor: pointer;
-            border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;
-        }
-        .card-resumen:hover { border-color: var(--primary); background: #1e293b; }
+        /* TAREAS Y MATERIALES VINCULADOS */
+        .tarea-contenedor { background: var(--white); border: 1px solid #e2e8f0; border-radius: var(--radius); padding: 12px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .tarea-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .tarea-header span { flex: 1; font-weight: 600; font-size: 0.95rem; }
+        .completada { text-decoration: line-through; color: var(--text-muted); }
 
-        /* SUBPANTALLA DETALLE */
-        .btn-volver { background: none; border: none; color: var(--primary); font-weight: bold; cursor: pointer; margin-bottom: 15px; padding: 0; }
-        .seccion-titulo { font-size: 0.9rem; font-weight: 800; color: var(--text-muted); margin: 20px 0 10px 0; display: block; border-bottom: 1px solid var(--border); }
+        .material-list { margin-left: 25px; border-left: 2px solid #e2e8f0; padding-left: 10px; }
+        .material-item { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; padding: 4px 0; color: var(--text-muted); }
 
         /* FORMULARIOS */
-        .form-mini { display: flex; gap: 5px; margin-bottom: 15px; }
-        .form-mini input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border); font-size: 0.9rem; background: #334155; color: white; }
-        .form-mini input::placeholder { color: #94a3b8; }
-        .btn-add { background: var(--primary); color: white; border: none; padding: 0 15px; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .btn-add-mat { background: var(--success); }
+        .form-mini { display: flex; gap: 5px; margin-bottom: 10px; }
+        .form-mini input { flex: 1; padding: 8px; border-radius: 6px; border: 1px solid #ddd; }
+        .btn-add { background: var(--primary); color: white; border: none; padding: 0 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-add-sm { background: var(--success); font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; color: white; border: none; cursor: pointer; }
 
-        /* ITEMS (TAREAS Y MATERIALES) */
-        .item-row { background: var(--card-bg); padding: 10px; border-radius: 8px; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.2); border: 1px solid var(--border); }
-        .item-row span { flex: 1; font-size: 0.95rem; color: var(--text-main); }
-        .btn-del-small { background: none; border: none; color: #64748b; cursor: pointer; font-size: 0.9rem; }
-        .btn-del-small:hover { color: var(--danger); }
-        .completada { text-decoration: line-through; color: var(--text-muted); opacity: 0.5; }
+        .badge { padding: 3px 8px; border-radius: 20px; font-size: 0.6rem; font-weight: 800; }
+        .prio-2 { background: #fee2e2; color: #ef4444; } 
+        .prio-1 { background: #fef3c7; color: #d97706; } 
+        .prio-0 { background: #dcfce7; color: #10b981; }
 
-        textarea { width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 10px; box-sizing: border-box; font-family: inherit; background: #1e293b; color: #fff; }
-        
-        /* Checkbox personalizado para que pegue con el diseño */
-        input[type="checkbox"] { transform: scale(1.2); cursor: pointer; accent-color: var(--success); }
+        textarea { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; box-sizing: border-box; font-family: inherit; margin-bottom: 10px; }
+        .btn-del { background: none; border: none; color: #ccc; cursor: pointer; }
+        .btn-del:hover { color: var(--danger); }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header">
-        <h1>CONTROL DE OBRAS</h1>
-    </div>
+    <div class="header"><h1>CONTROL DE OBRAS</h1></div>
 
     <div id="pantallaListado" class="pantalla activa">
         <div class="stats-grid">
-            <div class="stat-box box-curso">
-                <span id="numCurso">0</span>
-                <small>En curso</small>
-            </div>
-            <div class="stat-box box-fin">
-                <span id="numFin">0</span>
-                <small>Finalizadas</small>
-            </div>
+            <div class="stat-box" style="border-color: var(--warning)"> <span id="numCurso">0</span> <small>En curso</small> </div>
+            <div class="stat-box" style="border-color: var(--success)"> <span id="numFin">0</span> <small>Terminadas</small> </div>
         </div>
-
-        <div class="filtros-container">
-            <button class="btn-filtro activo" id="btn-todas" onclick="cambiarFiltro('todas')">TODAS</button>
-            <button class="btn-filtro" id="btn-curso" onclick="cambiarFiltro('curso')">EN CURSO</button>
-            <button class="btn-finalizadas btn-filtro" id="btn-finalizadas" onclick="cambiarFiltro('finalizadas')">FINALIZADAS</button>
-        </div>
-
         <div class="form-mini">
-            <input type="text" id="nuevoNombreObra" placeholder="Nueva obra o cliente...">
+            <input type="text" id="nuevoNombreObra" placeholder="Nombre de obra o cliente...">
             <button class="btn-add" onclick="crearObra()">CREAR</button>
         </div>
+        <input type="text" id="buscador" placeholder="🔍 Buscar obra..." onkeyup="renderListado()" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:15px; box-sizing:border-box;">
         <div id="listaObras"></div>
     </div>
 
     <div id="pantallaDetalle" class="pantalla">
-        <button class="btn-volver" onclick="irAListado()">← VOLVER AL LISTADO</button>
+        <button onclick="irAListado()" style="background:none; border:none; color:var(--primary); font-weight:bold; cursor:pointer; margin-bottom:15px;">← VOLVER</button>
         <div id="contenidoDetalle"></div>
     </div>
 </div>
 
 <script>
-    let obras = JSON.parse(localStorage.getItem('obras_v_final')) || [];
+    let obras = JSON.parse(localStorage.getItem('obras_v_task_mats')) || [];
     let idObraActual = null;
-    let filtroActual = 'todas';
 
-    function guardar() { localStorage.setItem('obras_v_final', JSON.stringify(obras)); }
-
-    function cambiarFiltro(f) {
-        filtroActual = f;
-        document.querySelectorAll('.btn-filtro').forEach(b => b.classList.remove('activo'));
-        document.getElementById('btn-' + f).classList.add('activo');
-        renderListado();
-    }
-
-    function irADetalle(id) {
-        idObraActual = id;
-        document.getElementById('pantallaListado').classList.remove('activa');
-        document.getElementById('pantallaDetalle').classList.add('activa');
-        renderDetalle();
-    }
-
-    function irAListado() {
-        idObraActual = null;
-        document.getElementById('pantallaDetalle').classList.remove('activa');
-        document.getElementById('pantallaListado').classList.add('activa');
-        renderListado();
-    }
+    function guardar() { localStorage.setItem('obras_v_task_mats', JSON.stringify(obras)); }
 
     function crearObra() {
         const input = document.getElementById('nuevoNombreObra');
         if (!input.value.trim()) return;
-        obras.push({ id: Date.now(), nombre: input.value, tareas: [], materiales: [], notas: "" });
-        input.value = '';
-        guardar();
-        renderListado();
+        obras.push({ id: Date.now(), nombre: input.value, prioridad: 1, tareas: [], notas: "" });
+        input.value = ''; guardar(); renderListado();
     }
 
     function renderListado() {
         const contenedor = document.getElementById('listaObras');
-        let enCurso = 0, finalizadas = 0;
+        const busqueda = document.getElementById('buscador').value.toLowerCase();
         contenedor.innerHTML = '';
 
-        const filtradas = obras.filter(o => {
-            const hechas = o.tareas.filter(t => t.hecha).length;
-            const total = o.tareas.length;
-            const esFin = (total > 0 && hechas === total);
-            esFin ? finalizadas++ : enCurso++;
-
-            if (filtroActual === 'curso') return !esFin;
-            if (filtroActual === 'finalizadas') return esFin;
-            return true;
+        const ordenadas = [...obras].sort((a, b) => {
+            const finA = a.tareas.length > 0 && a.tareas.every(t => t.hecha);
+            const finB = b.tareas.length > 0 && b.tareas.every(t => t.hecha);
+            if (finA !== finB) return finA ? 1 : -1;
+            return b.prioridad - a.prioridad;
         });
 
-        document.getElementById('numCurso').innerText = enCurso;
-        document.getElementById('numFin').innerText = finalizadas;
-
-        filtradas.forEach(obra => {
+        ordenadas.filter(o => o.nombre.toLowerCase().includes(busqueda)).forEach(obra => {
             const hechas = obra.tareas.filter(t => t.hecha).length;
             const total = obra.tareas.length;
             const porc = total === 0 ? 0 : Math.round((hechas/total)*100);
+            const esFin = total > 0 && hechas === total;
             
             contenedor.innerHTML += `
-                <div class="card-resumen" onclick="irADetalle(${obra.id})">
+                <div class="card-resumen ${esFin ? 'obra-terminada' : ''}" onclick="irADetalle(${obra.id})">
                     <div>
+                        <span class="badge prio-${obra.prioridad}">${esFin ? 'TERMINADA' : (['Baja','Media','Alta'][obra.prioridad])}</span>
                         <strong style="display:block">${obra.nombre}</strong>
-                        <small style="color:var(--text-muted)">${obra.materiales.length} materiales</small>
+                        <small style="color:var(--text-muted)">${total} tareas asignadas</small>
                     </div>
-                    <div style="text-align:right">
-                        <span style="font-weight:800; color:var(--primary)">${porc}%</span>
-                    </div>
+                    <div style="font-weight:800; color:${esFin ? 'var(--success)':'var(--primary)'}">${porc}%</div>
                 </div>`;
         });
+
+        document.getElementById('numCurso').innerText = obras.filter(o => !(o.tareas.length > 0 && o.tareas.every(t => t.hecha))).length;
+        document.getElementById('numFin').innerText = obras.filter(o => o.tareas.length > 0 && o.tareas.every(t => t.hecha)).length;
     }
 
     function renderDetalle() {
         const obra = obras.find(o => o.id === idObraActual);
         const contenedor = document.getElementById('contenidoDetalle');
         
-        const tareasHTML = obra.tareas.map(t => `
-            <div class="item-row">
-                <input type="checkbox" ${t.hecha ? 'checked' : ''} onchange="toggleTarea(${t.id})">
-                <span class="${t.hecha ? 'completada' : ''}">${t.texto}</span>
-                <button class="btn-del-small" onclick="borrarItem('tareas', ${t.id})">✕</button>
-            </div>`).join('');
+        const tareasHTML = obra.tareas.map(t => {
+            const matsHTML = t.materiales.map(m => `
+                <div class="material-item">
+                    <span>• ${m.texto}</span>
+                    <button class="btn-del" onclick="borrarMaterial(${t.id}, ${m.id})">✕</button>
+                </div>`).join('');
 
-        const materialesHTML = obra.materiales.map(m => `
-            <div class="item-row" style="border-left: 4px solid var(--success)">
-                <span>${m.texto}</span>
-                <button class="btn-del-small" onclick="borrarItem('materiales', ${m.id})">✕</button>
-            </div>`).join('');
+            return `
+            <div class="tarea-contenedor">
+                <div class="tarea-header">
+                    <input type="checkbox" ${t.hecha ? 'checked' : ''} onchange="toggleTarea(${t.id})">
+                    <span class="${t.hecha ? 'completada' : ''}">${t.texto}</span>
+                    <button class="btn-del" onclick="borrarTarea(${t.id})">✕</button>
+                </div>
+                <div class="material-list">
+                    ${matsHTML}
+                    <div class="form-mini" style="margin-top:8px">
+                        <input type="text" id="inMat-${t.id}" placeholder="Añadir material..." style="font-size:0.8rem; padding:4px">
+                        <button class="btn-add-sm" onclick="agregarMaterial(${t.id})">Vincular</button>
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
 
         contenedor.innerHTML = `
-            <h2 style="margin:0; color:var(--white)">${obra.nombre}</h2>
+            <div style="display:flex; justify-content:space-between; align-items:start">
+                <h2 style="margin:0">${obra.nombre}</h2>
+                <button onclick="exportarObra()" style="background:var(--primary); color:white; border:none; padding:8px 12px; border-radius:8px; font-size:0.7rem; cursor:pointer; font-weight:bold">📤 EXPORTAR</button>
+            </div>
             
-            <span class="seccion-titulo">NOTAS Y UBICACIÓN</span>
-            <textarea rows="3" onblur="actualizarNotas(this.value)">${obra.notas}</textarea>
+            <label style="font-size:0.7rem; font-weight:bold; color:var(--text-muted); display:block; margin-top:15px">PRIORIDAD</label>
+            <select class="prio-select" onchange="cambiarPrioridad(this.value)">
+                <option value="2" ${obra.prioridad === 2 ? 'selected' : ''}>🔴 Alta</option>
+                <option value="1" ${obra.prioridad === 1 ? 'selected' : ''}>🟡 Media</option>
+                <option value="0" ${obra.prioridad === 0 ? 'selected' : ''}>🟢 Baja</option>
+            </select>
 
-            <span class="seccion-titulo">TAREAS</span>
-            <div class="form-mini">
-                <input type="text" id="inTarea" placeholder="Añadir tarea...">
-                <button class="btn-add" onclick="agregarItem('tareas', 'inTarea')">+</button>
+            <textarea placeholder="Notas generales o dirección..." onblur="actualizarNotas(this.value)">${obra.notas}</textarea>
+
+            <div style="background:#eef2ff; padding:10px; border-radius:8px; margin-bottom:20px">
+                <label style="font-size:0.7rem; font-weight:bold; color:var(--primary); display:block; margin-bottom:5px">NUEVA TAREA PRINCIPAL</label>
+                <div class="form-mini">
+                    <input type="text" id="inTarea" placeholder="Ej: Instalación de cuadro...">
+                    <button class="btn-add" onclick="agregarTarea()">+</button>
+                </div>
             </div>
-            <div>${tareasHTML || '<small style="color:var(--text-muted)">Sin tareas</small>'}</div>
 
-            <span class="seccion-titulo">MATERIALES</span>
-            <div class="form-mini">
-                <input type="text" id="inMat" placeholder="Añadir material...">
-                <button class="btn-add btn-add-mat" onclick="agregarItem('materiales', 'inMat')">+</button>
-            </div>
-            <div>${materialesHTML || '<small style="color:var(--text-muted)">Sin materiales</small>'}</div>
-
-            <button style="margin-top:40px; color:var(--danger); background:none; border:none; cursor:pointer; font-size:0.75rem; width:100%; text-align:center" onclick="borrarObra(${obra.id})">ELIMINAR ESTA OBRA PERMANENTEMENTE</button>
+            <div>${tareasHTML || '<p style="text-align:center; color:var(--text-muted)">No hay tareas creadas</p>'}</div>
+            
+            <button style="margin-top:30px; color:var(--danger); background:none; border:none; width:100%; font-size:0.7rem; cursor:pointer" onclick="borrarObra(${obra.id})">ELIMINAR ESTA OBRA</button>
         `;
     }
 
-    function agregarItem(tipo, idIn) {
-        const val = document.getElementById(idIn).value.trim();
+    // LÓGICA DE TAREAS Y MATERIALES
+    function agregarTarea() {
+        const val = document.getElementById('inTarea').value.trim();
         if(!val) return;
-        obras.find(o => o.id === idObraActual)[tipo].push({ id: Date.now(), texto: val, hecha: false });
+        const o = obras.find(x => x.id === idObraActual);
+        o.tareas.push({ id: Date.now(), texto: val, hecha: false, materiales: [] });
         guardar(); renderDetalle();
     }
 
-    function borrarItem(tipo, id) {
-        const obra = obras.find(o => o.id === idObraActual);
-        obra[tipo] = obra[tipo].filter(i => i.id !== id);
+    function borrarTarea(idT) {
+        const o = obras.find(x => x.id === idObraActual);
+        o.tareas = o.tareas.filter(t => t.id !== idT);
         guardar(); renderDetalle();
     }
 
-    function toggleTarea(id) {
-        const t = obras.find(o => o.id === idObraActual).tareas.find(x => x.id === id);
+    function toggleTarea(idT) {
+        const o = obras.find(x => x.id === idObraActual);
+        const t = o.tareas.find(x => x.id === idT);
         t.hecha = !t.hecha;
+        guardar(); renderDetalle(); renderListado();
+    }
+
+    function agregarMaterial(idT) {
+        const input = document.getElementById(`inMat-${idT}`);
+        if(!input.value.trim()) return;
+        const o = obras.find(x => x.id === idObraActual);
+        const t = o.tareas.find(x => x.id === idT);
+        t.materiales.push({ id: Date.now(), texto: input.value.trim() });
+        input.value = ''; guardar(); renderDetalle();
+    }
+
+    function borrarMaterial(idT, idM) {
+        const o = obras.find(x => x.id === idObraActual);
+        const t = o.tareas.find(x => x.id === idT);
+        t.materiales = t.materiales.filter(m => m.id !== idM);
         guardar(); renderDetalle();
     }
 
-    function actualizarNotas(v) { 
-        obras.find(o => o.id === idObraActual).notas = v; 
-        guardar(); 
+    // FUNCIONES AUXILIARES
+    function exportarObra() {
+        const o = obras.find(x => x.id === idObraActual);
+        let texto = `⚡ *REPORTE: ${o.nombre.toUpperCase()}*\n\n`;
+        o.tareas.forEach(t => {
+            texto += `${t.hecha ? '✅' : '⬜'} *${t.texto}*\n`;
+            t.materiales.forEach(m => texto += `   └ 📦 ${m.texto}\n`);
+            texto += `\n`;
+        });
+        if (navigator.share) { navigator.share({ title: o.nombre, text: texto }); }
+        else { navigator.clipboard.writeText(texto); alert("Copiado al portapapeles"); }
     }
 
-    function borrarObra(id) { 
-        if(confirm("¿Seguro que quieres borrar la obra?")) { 
-            obras = obras.filter(o => o.id !== id); 
-            guardar(); irAListado(); 
-        } 
-    }
+    function cambiarPrioridad(v) { obras.find(o => o.id === idObraActual).prioridad = parseInt(v); guardar(); }
+    function actualizarNotas(v) { obras.find(o => o.id === idObraActual).notes = v; guardar(); }
+    function irADetalle(id) { idObraActual = id; document.getElementById('pantallaListado').classList.remove('activa'); document.getElementById('pantallaDetalle').classList.add('activa'); renderDetalle(); }
+    function irAListado() { idObraActual = null; document.getElementById('pantallaDetalle').classList.remove('activa'); document.getElementById('pantallaListado').classList.add('activa'); renderListado(); }
+    function borrarObra(id) { if(confirm("¿Borrar obra?")) { obras = obras.filter(o => o.id !== id); guardar(); irAListado(); } }
 
     renderListado();
 </script>
