@@ -23,176 +23,59 @@
             padding: 0;
         }
 
-        header {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 1.5rem 2rem;
-            display: block;
-            text-align: center;
-        }
-
-        header h1 {
-            margin: 0 0 1rem 0;
-            font-size: 24px;
-        }
+        header { background-color: var(--primary-color); color: white; padding: 1.5rem 2rem; display: block; text-align: center; }
+        header h1 { margin: 0 0 1rem 0; font-size: 24px; }
 
         .btn-export-excel {
-            display: inline-block;
-            background-color: #107c41;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            cursor: pointer;
-            border-radius: 4px;
-            font-size: 14px;
-            font-weight: bold;
-            transition: background-color 0.2s;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            display: inline-block; background-color: #107c41; color: white; border: none;
+            padding: 12px 24px; cursor: pointer; border-radius: 4px; font-size: 14px;
+            font-weight: bold; transition: background-color 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
-
         .btn-export-excel:hover { background-color: #0c5e31; }
 
-        .tab-menu {
-            display: flex;
-            justify-content: center;
-            background-color: var(--secondary-color);
-            flex-wrap: wrap;
-        }
-
+        .tab-menu { display: flex; justify-content: center; background-color: var(--secondary-color); flex-wrap: wrap; }
         .tab-menu button {
-            background-color: inherit;
-            color: white;
-            border: none;
-            outline: none;
-            cursor: pointer;
-            padding: 14px 24px;
-            font-size: 16px;
-            transition: 0.3s;
+            background-color: inherit; color: white; border: none; outline: none;
+            cursor: pointer; padding: 14px 24px; font-size: 16px; transition: 0.3s;
         }
-
-        .tab-menu button:hover, .tab-menu button.active {
-            background-color: var(--accent-color);
-            font-weight: bold;
-        }
+        .tab-menu button:hover, .tab-menu button.active { background-color: var(--accent-color); font-weight: bold; }
 
         .container {
-            max-width: 1000px;
-            margin: 2rem auto;
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-width: 1000px; margin: 2rem auto; background: white; padding: 2rem;
+            border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.5s;
-        }
-
+        .tab-content { display: none; animation: fadeIn 0.5s; }
         @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-        }
-
-        table th, table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        table th, table td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
         table th { background-color: var(--primary-color); color: white; }
         table tr:hover { background-color: #f1f1f1; }
 
-        .btn-add {
-            background-color: #27ae60;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-
+        .btn-add { background-color: #27ae60; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 4px; font-size: 14px; }
         .btn-add:hover { background-color: #219150; }
 
         .header-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid var(--accent-color);
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 10px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;
         }
         
         .status-paid { color: #27ae60; font-weight: bold; }
         .status-pending { color: #e67e22; font-weight: bold; }
 
-        /* NUEVO: Estilos para la ventana emergente (Modal) */
-        .modal {
-            display: none; /* Oculto por defecto */
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5); /* Fondo oscuro semitransparente */
-        }
+        /* Estilos para las ventanas emergentes (Modales) */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
+        .modal-content { background-color: white; margin: 5% auto; padding: 25px; border-radius: 8px; width: 320px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .modal-content h3 { margin-top: 0; color: var(--primary-color); }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
+        /* Añadido "select" para que los desplegables se vean igual que los textos */
+        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit;}
 
-        .modal-content {
-            background-color: white;
-            margin: 10% auto; /* Centrado */
-            padding: 25px;
-            border-radius: 8px;
-            width: 300px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        .modal-content h3 {
-            margin-top: 0;
-            color: var(--primary-color);
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            font-size: 14px;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-
-        .modal-buttons {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .btn-cancel {
-            background-color: #95a5a6;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
+        .modal-buttons { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+        .btn-cancel { background-color: #95a5a6; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; }
         .btn-cancel:hover { background-color: #7f8c8d; }
     </style>
 </head>
@@ -205,6 +88,7 @@
 
     <div class="tab-menu">
         <button class="tab-links active" onclick="openTab(event, 'Contactos')">Lista de Contactos</button>
+        <button class="tab-links" onclick="openTab(event, 'Proveedores')">Lista de Proveedores</button>
         <button class="tab-links" onclick="openTab(event, 'Pagos')">Relación de Pagos</button>
         <button class="tab-links" onclick="openTab(event, 'Ingresos')">Relación de Ingresos</button>
     </div>
@@ -217,20 +101,27 @@
             </div>
             <table id="tablaContactos">
                 <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Teléfono</th>
-                    </tr>
+                    <tr><th>Nombre</th><th>Teléfono</th></tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Juan Pérez</td>
-                        <td>+34 600 123 456</td>
-                    </tr>
-                    <tr>
-                        <td>María López</td>
-                        <td>+34 600 654 321</td>
-                    </tr>
+                    <tr><td>Juan Pérez</td><td>+34 600 123 456</td></tr>
+                    <tr><td>María López</td><td>+34 600 654 321</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="Proveedores" class="tab-content">
+            <div class="header-section">
+                <h2>Lista de Proveedores</h2>
+                <button class="btn-add" style="background-color: #8e44ad;" onclick="abrirModalProveedor()">+ Añadir Proveedor</button>
+            </div>
+            <table id="tablaProveedores">
+                <thead>
+                    <tr><th>Nombre / Empresa</th><th>Teléfono</th><th>Correo</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Suministros Ofi S.L.</td><td>+34 912 345 678</td><td>ventas@suministrosofi.es</td></tr>
+                    <tr><td>Iberdrola</td><td>+34 900 225 235</td><td>empresas@iberdrola.es</td></tr>
                 </tbody>
             </table>
         </div>
@@ -238,30 +129,14 @@
         <div id="Pagos" class="tab-content">
             <div class="header-section">
                 <h2>Relación de Pagos (Gastos)</h2>
-                <button class="btn-add" style="background-color: #c0392b;">+ Registrar Pago</button>
+                <button class="btn-add" style="background-color: #c0392b;" onclick="abrirModalPago()">+ Registrar Pago</button>
             </div>
             <table id="tablaPagos">
                 <thead>
-                    <tr>
-                        <th>Fecha</th>
-                        <th>Concepto / Proveedor</th>
-                        <th>Importe</th>
-                        <th>Estado</th>
-                    </tr>
+                    <tr><th>Fecha</th><th>Concepto / Proveedor</th><th>Importe</th><th>Estado</th></tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>10/06/2026</td>
-                        <td>Factura Luz - Iberdrola</td>
-                        <td>150.00 €</td>
-                        <td class="status-paid">Pagado</td>
-                    </tr>
-                    <tr>
-                        <td>15/06/2026</td>
-                        <td>Suministros Oficina</td>
-                        <td>85.50 €</td>
-                        <td class="status-pending">Pendiente</td>
-                    </tr>
+                    <tr><td>2026-06-10</td><td>Factura Luz - Iberdrola</td><td>150.00 €</td><td class="status-paid">Pagado</td></tr>
                 </tbody>
             </table>
         </div>
@@ -269,30 +144,14 @@
         <div id="Ingresos" class="tab-content">
             <div class="header-section">
                 <h2>Relación de Ingresos</h2>
-                <button class="btn-add">+ Registrar Ingreso</button>
+                <button class="btn-add" onclick="abrirModalIngreso()">+ Registrar Ingreso</button>
             </div>
             <table id="tablaIngresos">
                 <thead>
-                    <tr>
-                        <th>Fecha</th>
-                        <th>Cliente / Concepto</th>
-                        <th>Importe</th>
-                        <th>Estado</th>
-                    </tr>
+                    <tr><th>Fecha</th><th>Cliente / Concepto</th><th>Importe</th><th>Estado</th></tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>01/06/2026</td>
-                        <td>Distribuciones SL - Proyecto A</td>
-                        <td>1,200.00 €</td>
-                        <td class="status-paid">Cobrado</td>
-                    </tr>
-                    <tr>
-                        <td>12/06/2026</td>
-                        <td>Consultoría MKT Digital</td>
-                        <td>450.00 €</td>
-                        <td class="status-pending">Pendiente de Cobro</td>
-                    </tr>
+                    <tr><td>2026-06-01</td><td>Juan Pérez - Proyecto A</td><td>1200.00 €</td><td class="status-paid">Cobrado</td></tr>
                 </tbody>
             </table>
         </div>
@@ -301,100 +160,19 @@
     <div id="modalContacto" class="modal">
         <div class="modal-content">
             <h3>Nuevo Contacto</h3>
-            
-            <div class="form-group">
-                <label>Nombre:</label>
-                <input type="text" id="inputNombre" placeholder="Ej. Carlos Martínez">
-            </div>
-            
-            <div class="form-group">
-                <label>Teléfono:</label>
-                <input type="text" id="inputTelefono" placeholder="Ej. 600 000 000">
-            </div>
-
+            <div class="form-group"><label>Nombre:</label><input type="text" id="inputContNombre" placeholder="Ej. Carlos Martínez"></div>
+            <div class="form-group"><label>Teléfono:</label><input type="text" id="inputContTel" placeholder="Ej. 600 000 000"></div>
             <div class="modal-buttons">
-                <button class="btn-cancel" onclick="cerrarModalContacto()">Cancelar</button>
-                <button class="btn-add" style="margin: 0;" onclick="guardarContacto()">Guardar</button>
+                <button class="btn-cancel" onclick="cerrarModal('modalContacto')">Cancelar</button>
+                <button class="btn-add" onclick="guardarContacto()">Guardar</button>
             </div>
         </div>
     </div>
 
-    <script>
-        // --- 1. Lógica de Pestañas ---
-        function openTab(evt, tabName) {
-            var i, tabcontent, tablinks;
-            tabcontent = document.getElementsByClassName("tab-content");
-            for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].style.display = "none";
-            }
-            tablinks = document.getElementsByClassName("tab-links");
-            for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].className = tablinks[i].className.replace(" active", "");
-            }
-            document.getElementById(tabName).style.display = "block";
-            evt.currentTarget.className += " active";
-        }
-
-        // --- 2. Lógica para Exportar a Excel ---
-        function exportarTodoAExcel() {
-            var wb = XLSX.utils.book_new();
-
-            var tablaCont = document.getElementById("tablaContactos");
-            var tablaPag = document.getElementById("tablaPagos");
-            var tablaIng = document.getElementById("tablaIngresos");
-
-            var hojaContactos = XLSX.utils.table_to_sheet(tablaCont);
-            var hojaPagos = XLSX.utils.table_to_sheet(tablaPag);
-            var hojaIngresos = XLSX.utils.table_to_sheet(tablaIng);
-
-            XLSX.utils.book_append_sheet(wb, hojaContactos, "Contactos");
-            XLSX.utils.book_append_sheet(wb, hojaPagos, "Pagos");
-            XLSX.utils.book_append_sheet(wb, hojaIngresos, "Ingresos");
-
-            XLSX.writeFile(wb, "Gestion_de_Empresa.xlsx");
-        }
-
-        // --- 3. Lógica del Botón Añadir Contacto ---
-        
-        // Abre la ventana
-        function abrirModalContacto() {
-            document.getElementById("modalContacto").style.display = "block";
-        }
-
-        // Cierra la ventana y limpia los textos escritos
-        function cerrarModalContacto() {
-            document.getElementById("modalContacto").style.display = "none";
-            document.getElementById("inputNombre").value = "";
-            document.getElementById("inputTelefono").value = "";
-        }
-
-        // Guarda los datos en la tabla
-        function guardarContacto() {
-            var nombre = document.getElementById("inputNombre").value;
-            var telefono = document.getElementById("inputTelefono").value;
-
-            // Comprobar que no estén vacíos
-            if (nombre.trim() === "" || telefono.trim() === "") {
-                alert("Por favor, rellena tanto el nombre como el teléfono.");
-                return;
-            }
-
-            // Localizar el cuerpo de la tabla (<tbody>)
-            var tbody = document.querySelector("#tablaContactos tbody");
-            
-            // Crear una nueva fila (<tr>)
-            var nuevaFila = document.createElement("tr");
-            
-            // Meter los datos en las columnas (<td>)
-            nuevaFila.innerHTML = "<td>" + nombre + "</td><td>" + telefono + "</td>";
-            
-            // Insertar la nueva fila en la tabla
-            tbody.appendChild(nuevaFila);
-            
-            // Cerrar el modal
-            cerrarModalContacto();
-        }
-    </script>
-
-</body>
-</html>
+    <div id="modalProveedor" class="modal">
+        <div class="modal-content">
+            <h3 style="color: #8e44ad;">Nuevo Proveedor</h3>
+            <div class="form-group"><label>Nombre / Empresa:</label><input type="text" id="inputProvNombre"></div>
+            <div class="form-group"><label>Teléfono:</label><input type="text" id="inputProvTel"></div>
+            <div class="form-group"><label>Correo:</label><input type="email" id="inputProvEmail"></div>
+            <div class="modal-buttons">
