@@ -23,7 +23,6 @@
             padding: 0;
         }
 
-        /* Encabezado corregido para evitar solapamientos */
         header {
             background-color: var(--primary-color);
             color: white;
@@ -37,10 +36,9 @@
             font-size: 24px;
         }
 
-        /* Botón general de Exportar a Excel recolocado de forma segura */
         .btn-export-excel {
             display: inline-block;
-            background-color: #107c41; /* Verde Excel */
+            background-color: #107c41;
             color: white;
             border: none;
             padding: 12px 24px;
@@ -52,11 +50,8 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
-        .btn-export-excel:hover {
-            background-color: #0c5e31;
-        }
+        .btn-export-excel:hover { background-color: #0c5e31; }
 
-        /* Navegación por pestañas */
         .tab-menu {
             display: flex;
             justify-content: center;
@@ -75,16 +70,11 @@
             transition: 0.3s;
         }
 
-        .tab-menu button:hover {
-            background-color: var(--accent-color);
-        }
-
-        .tab-menu button.active {
+        .tab-menu button:hover, .tab-menu button.active {
             background-color: var(--accent-color);
             font-weight: bold;
         }
 
-        /* Contenido principal */
         .container {
             max-width: 1000px;
             margin: 2rem auto;
@@ -99,12 +89,8 @@
             animation: fadeIn 0.5s;
         }
 
-        @keyframes fadeIn {
-            from {opacity: 0;}
-            to {opacity: 1;}
-        }
+        @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
 
-        /* Tablas */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -117,16 +103,9 @@
             border-bottom: 1px solid #ddd;
         }
 
-        table th {
-            background-color: var(--primary-color);
-            color: white;
-        }
+        table th { background-color: var(--primary-color); color: white; }
+        table tr:hover { background-color: #f1f1f1; }
 
-        table tr:hover {
-            background-color: #f1f1f1;
-        }
-
-        /* Botones de acción dentro de las pestañas */
         .btn-add {
             background-color: #27ae60;
             color: white;
@@ -137,9 +116,7 @@
             font-size: 14px;
         }
 
-        .btn-add:hover {
-            background-color: #219150;
-        }
+        .btn-add:hover { background-color: #219150; }
 
         .header-section {
             display: flex;
@@ -154,6 +131,69 @@
         
         .status-paid { color: #27ae60; font-weight: bold; }
         .status-pending { color: #e67e22; font-weight: bold; }
+
+        /* NUEVO: Estilos para la ventana emergente (Modal) */
+        .modal {
+            display: none; /* Oculto por defecto */
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5); /* Fondo oscuro semitransparente */
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto; /* Centrado */
+            padding: 25px;
+            border-radius: 8px;
+            width: 300px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-cancel {
+            background-color: #95a5a6;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-cancel:hover { background-color: #7f8c8d; }
     </style>
 </head>
 <body>
@@ -173,26 +213,23 @@
         <div id="Contactos" class="tab-content" style="display: block;">
             <div class="header-section">
                 <h2>Directorio de Contactos</h2>
-                <button class="btn-add">+ Añadir Contacto</button>
+                <button class="btn-add" onclick="abrirModalContacto()">+ Añadir Contacto</button>
             </div>
             <table id="tablaContactos">
                 <thead>
                     <tr>
                         <th>Nombre</th>
                         <th>Teléfono</th>
-                        <th>Email</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
                         <td>Juan Pérez</td>
                         <td>+34 600 123 456</td>
-                        <td>juan@distribucionessl.com</td>
                     </tr>
                     <tr>
                         <td>María López</td>
                         <td>+34 600 654 321</td>
-                        <td>maria@mktdigital.es</td>
                     </tr>
                 </tbody>
             </table>
@@ -261,24 +298,44 @@
         </div>
     </div>
 
+    <div id="modalContacto" class="modal">
+        <div class="modal-content">
+            <h3>Nuevo Contacto</h3>
+            
+            <div class="form-group">
+                <label>Nombre:</label>
+                <input type="text" id="inputNombre" placeholder="Ej. Carlos Martínez">
+            </div>
+            
+            <div class="form-group">
+                <label>Teléfono:</label>
+                <input type="text" id="inputTelefono" placeholder="Ej. 600 000 000">
+            </div>
+
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="cerrarModalContacto()">Cancelar</button>
+                <button class="btn-add" style="margin: 0;" onclick="guardarContacto()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // --- 1. Lógica de Pestañas ---
         function openTab(evt, tabName) {
             var i, tabcontent, tablinks;
-
             tabcontent = document.getElementsByClassName("tab-content");
             for (i = 0; i < tabcontent.length; i++) {
                 tabcontent[i].style.display = "none";
             }
-
             tablinks = document.getElementsByClassName("tab-links");
             for (i = 0; i < tablinks.length; i++) {
                 tablinks[i].className = tablinks[i].className.replace(" active", "");
             }
-
             document.getElementById(tabName).style.display = "block";
             evt.currentTarget.className += " active";
         }
 
+        // --- 2. Lógica para Exportar a Excel ---
         function exportarTodoAExcel() {
             var wb = XLSX.utils.book_new();
 
@@ -295,6 +352,47 @@
             XLSX.utils.book_append_sheet(wb, hojaIngresos, "Ingresos");
 
             XLSX.writeFile(wb, "Gestion_de_Empresa.xlsx");
+        }
+
+        // --- 3. Lógica del Botón Añadir Contacto ---
+        
+        // Abre la ventana
+        function abrirModalContacto() {
+            document.getElementById("modalContacto").style.display = "block";
+        }
+
+        // Cierra la ventana y limpia los textos escritos
+        function cerrarModalContacto() {
+            document.getElementById("modalContacto").style.display = "none";
+            document.getElementById("inputNombre").value = "";
+            document.getElementById("inputTelefono").value = "";
+        }
+
+        // Guarda los datos en la tabla
+        function guardarContacto() {
+            var nombre = document.getElementById("inputNombre").value;
+            var telefono = document.getElementById("inputTelefono").value;
+
+            // Comprobar que no estén vacíos
+            if (nombre.trim() === "" || telefono.trim() === "") {
+                alert("Por favor, rellena tanto el nombre como el teléfono.");
+                return;
+            }
+
+            // Localizar el cuerpo de la tabla (<tbody>)
+            var tbody = document.querySelector("#tablaContactos tbody");
+            
+            // Crear una nueva fila (<tr>)
+            var nuevaFila = document.createElement("tr");
+            
+            // Meter los datos en las columnas (<td>)
+            nuevaFila.innerHTML = "<td>" + nombre + "</td><td>" + telefono + "</td>";
+            
+            // Insertar la nueva fila en la tabla
+            tbody.appendChild(nuevaFila);
+            
+            // Cerrar el modal
+            cerrarModalContacto();
         }
     </script>
 
