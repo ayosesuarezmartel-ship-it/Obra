@@ -50,16 +50,29 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
             width: 100%;
             box-sizing: border-box;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
-        .tab-menu button:last-child {
-            border-bottom: none;
-        }
+        .tab-menu button:last-child { border-bottom: none; }
 
         .tab-menu button:hover, .tab-menu button.active { 
             background-color: var(--accent-color); 
             font-weight: bold; 
             padding-left: 25px; 
+        }
+
+        /* Estilo para los contadores (Badges) en el menú */
+        .tab-badge {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        .tab-menu button.active .tab-badge {
+            background-color: var(--primary-color);
         }
 
         .container {
@@ -75,6 +88,16 @@
         table th, table td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
         table th { background-color: var(--primary-color); color: white; }
         table tr:hover { background-color: #f1f1f1; }
+
+        /* Botones de acción en filas */
+        .btn-action {
+            border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer; 
+            font-size: 12px; margin-right: 4px; transition: 0.2s; color: white;
+        }
+        .btn-edit { background-color: #f39c12; }
+        .btn-edit:hover { background-color: #e67e22; }
+        .btn-delete { background-color: #e74c3c; }
+        .btn-delete:hover { background-color: #c0392b; }
 
         .btn-add { background-color: #27ae60; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 4px; font-size: 14px; }
         .btn-add:hover { background-color: #219150; }
@@ -97,123 +120,120 @@
         .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit;}
 
         .modal-buttons { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
-        .btn-cancel { background-color: #95a5a6; color: pink; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; }
+        .btn-cancel { background-color: #95a5a6; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; }
         .btn-cancel:hover { background-color: #7f8c8d; }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>GBD</h1>
+        <h1>Sistema de Gestión Empresarial</h1>
         <button class="btn-export-excel" onclick="exportarTodoAExcel()">📥 Exportar todo a Excel</button>
     </header>
 
     <div class="tab-menu">
-        <button class="tab-links active" onclick="openTab(event, 'Clientes')">Lista de clientes</button>
-        <button class="tab-links" onclick="openTab(event, 'Proveedores')">Lista de proveedores</button>
-        <button class="tab-links" onclick="openTab(event, 'Pagos')">Relación de pagos</button>
-        <button class="tab-links" onclick="openTab(event, 'Ingresos')">Relación de ingresos</button>
+        <button class="tab-links active" onclick="openTab(event, 'Clientes')">
+            Lista de clientes <span class="tab-badge" id="badge-clientes">0</span>
+        </button>
+        <button class="tab-links" onclick="openTab(event, 'Proveedores')">
+            Lista de proveedores <span class="tab-badge" id="badge-proveedores">0</span>
+        </button>
+        <button class="tab-links" onclick="openTab(event, 'Pagos')">
+            Relación de pagos <span class="tab-badge" id="badge-pagos">0</span>
+        </button>
+        <button class="tab-links" onclick="openTab(event, 'Ingresos')">
+            Relación de ingresos <span class="tab-badge" id="badge-ingresos">0</span>
+        </button>
     </div>
 
     <div class="container">
         <div id="Clientes" class="tab-content" style="display: block;">
             <div class="header-section">
-                <h2>Directorio de Clientes</h2>
+                <h2>Directorio de Clientes <span id="title-clientes"></span></h2>
                 <button class="btn-add" onclick="abrirModalCliente()">+ Añadir Cliente</button>
             </div>
             <table id="tablaClientes">
                 <thead>
-                    <tr><th>Nombre</th><th>Teléfono</th></tr>
+                    <tr><th>Nombre</th><th>Teléfono</th><th>Acciones</th></tr>
                 </thead>
-                <tbody>
-                    <tr><td>Juan Pérez</td><td>+34 600 123 456</td></tr>
-                    <tr><td>María López</td><td>+34 600 654 321</td></tr>
-                </tbody>
+                <tbody></tbody>
             </table>
         </div>
 
         <div id="Proveedores" class="tab-content">
             <div class="header-section">
-                <h2>Lista de Proveedores</h2>
+                <h2>Lista de Proveedores <span id="title-proveedores"></span></h2>
                 <button class="btn-add" style="background-color: #8e44ad;" onclick="abrirModalProveedor()">+ Añadir Proveedor</button>
             </div>
             <table id="tablaProveedores">
                 <thead>
-                    <tr><th>Nombre / Empresa</th><th>Teléfono</th><th>Correo</th></tr>
+                    <tr><th>Nombre / Empresa</th><th>Teléfono</th><th>Correo</th><th>Acciones</th></tr>
                 </thead>
-                <tbody>
-                    <tr><td>Suministros Ofi S.L.</td><td>+34 912 345 678</td><td>ventas@suministrosofi.es</td></tr>
-                    <tr><td>Iberdrola</td><td>+34 900 225 235</td><td>empresas@iberdrola.es</td></tr>
-                </tbody>
+                <tbody></tbody>
             </table>
         </div>
 
         <div id="Pagos" class="tab-content">
             <div class="header-section">
-                <h2>Relación de Pagos (Gastos)</h2>
+                <h2>Relación de Pagos (Gastos) <span id="title-pagos"></span></h2>
                 <button class="btn-add" style="background-color: #c0392b;" onclick="abrirModalPago()">+ Registrar Pago</button>
             </div>
             <table id="tablaPagos">
                 <thead>
-                    <tr><th>Fecha</th><th>Proveedor</th><th>Forma de Pago</th><th>Importe</th><th>Estado</th></tr>
+                    <tr><th>Fecha</th><th>Concepto / Proveedor</th><th>Forma de Pago</th><th>Importe</th><th>Estado</th><th>Acciones</th></tr>
                 </thead>
-                <tbody>
-                    <tr><td>2026-06-10</td><td>Factura Luz - Iberdrola</td><td>Transferencia</td><td>150.00 €</td><td class="status-paid">Pagado</td></tr>
-                </tbody>
+                <tbody></tbody>
             </table>
         </div>
 
         <div id="Ingresos" class="tab-content">
             <div class="header-section">
-                <h2>Relación de Ingresos</h2>
+                <h2>Relación de Ingresos <span id="title-ingresos"></span></h2>
                 <button class="btn-add" onclick="abrirModalIngreso()">+ Registrar Ingreso</button>
             </div>
             <table id="tablaIngresos">
                 <thead>
-                    <tr><th>Fecha</th><th>Cliente</th><th>Forma de Pago</th><th>Importe</th><th>Estado</th></tr>
+                    <tr><th>Fecha</th><th>Cliente / Concepto</th><th>Forma de Pago</th><th>Importe</th><th>Estado</th><th>Acciones</th></tr>
                 </thead>
-                <tbody>
-                    <tr><td>2026-06-01</td><td>Juan Pérez - Proyecto A</td><td>Bizum</td><td>1200.00 €</td><td class="status-paid">Cobrado</td></tr>
-                </tbody>
+                <tbody></tbody>
             </table>
         </div>
     </div>
 
     <div id="modalCliente" class="modal">
         <div class="modal-content">
-            <h3>Nuevo Cliente</h3>
+            <h3 id="modalClienteTitle">Nuevo Cliente</h3>
             <div class="form-group"><label>Nombre:</label><input type="text" id="inputCliNombre" placeholder="Ej. Carlos Martínez"></div>
             <div class="form-group"><label>Teléfono:</label><input type="text" id="inputCliTel" placeholder="Ej. 600 000 000"></div>
             <div class="modal-buttons">
                 <button class="btn-cancel" onclick="cerrarModal('modalCliente')">Cancelar</button>
-                <button class="btn-add" onclick="guardarCliente()">Guardar</button>
+                <button class="btn-add" id="btnGuardarCliente" onclick="guardarCliente()">Guardar</button>
             </div>
         </div>
     </div>
 
     <div id="modalProveedor" class="modal">
         <div class="modal-content">
-            <h3 style="color: #8e44ad;">Nuevo Proveedor</h3>
+            <h3 id="modalProveedorTitle" style="color: #8e44ad;">Nuevo Proveedor</h3>
             <div class="form-group"><label>Nombre / Empresa:</label><input type="text" id="inputProvNombre"></div>
             <div class="form-group"><label>Teléfono:</label><input type="text" id="inputProvTel"></div>
             <div class="form-group"><label>Correo:</label><input type="email" id="inputProvEmail"></div>
             <div class="modal-buttons">
                 <button class="btn-cancel" onclick="cerrarModal('modalProveedor')">Cancelar</button>
-                <button class="btn-add" style="background-color: #8e44ad;" onclick="guardarProveedor()">Guardar</button>
+                <button class="btn-add" id="btnGuardarProveedor" style="background-color: #8e44ad;" onclick="guardarProveedor()">Guardar</button>
             </div>
         </div>
     </div>
 
     <div id="modalPago" class="modal">
         <div class="modal-content">
-            <h3 style="color: #c0392b;">Registrar Pago</h3>
+            <h3 id="modalPagoTitle" style="color: #c0392b;">Registrar Pago</h3>
             <div class="form-group"><label>Fecha:</label><input type="date" id="inputPagoFecha"></div>
             <div class="form-group">
                 <label>Proveedor:</label>
                 <select id="selectPagoProveedor"></select>
             </div>
             <div class="form-group"><label>Concepto:</label><input type="text" id="inputPagoConcepto"></div>
-            
             <div class="form-group">
                 <label>Forma de Pago:</label>
                 <select id="selectPagoForma">
@@ -223,7 +243,6 @@
                     <option value="Transferencia">Transferencia</option>
                 </select>
             </div>
-
             <div class="form-group"><label>Importe (€):</label><input type="number" step="0.01" id="inputPagoImporte"></div>
             <div class="form-group">
                 <label>Estado:</label>
@@ -234,21 +253,20 @@
             </div>
             <div class="modal-buttons">
                 <button class="btn-cancel" onclick="cerrarModal('modalPago')">Cancelar</button>
-                <button class="btn-add" style="background-color: #c0392b;" onclick="guardarPago()">Guardar</button>
+                <button class="btn-add" id="btnGuardarPago" style="background-color: #c0392b;" onclick="guardarPago()">Guardar</button>
             </div>
         </div>
     </div>
 
     <div id="modalIngreso" class="modal">
         <div class="modal-content">
-            <h3>Registrar Ingreso</h3>
+            <h3 id="modalIngresoTitle">Registrar Ingreso</h3>
             <div class="form-group"><label>Fecha:</label><input type="date" id="inputIngresoFecha"></div>
             <div class="form-group">
                 <label>Cliente:</label>
                 <select id="selectIngresoCliente"></select>
             </div>
             <div class="form-group"><label>Concepto:</label><input type="text" id="inputIngresoConcepto"></div>
-            
             <div class="form-group">
                 <label>Forma de Pago:</label>
                 <select id="selectIngresoForma">
@@ -258,7 +276,6 @@
                     <option value="Transferencia">Transferencia</option>
                 </select>
             </div>
-
             <div class="form-group"><label>Importe (€):</label><input type="number" step="0.01" id="inputIngresoImporte"></div>
             <div class="form-group">
                 <label>Estado:</label>
@@ -269,67 +286,174 @@
             </div>
             <div class="modal-buttons">
                 <button class="btn-cancel" onclick="cerrarModal('modalIngreso')">Cancelar</button>
-                <button class="btn-add" onclick="guardarIngreso()">Guardar</button>
+                <button class="btn-add" id="btnGuardarIngreso" onclick="guardarIngreso()">Guardar</button>
             </div>
         </div>
     </div>
 
     <script>
-        // --- NAVEGACIÓN ---
+        // --- BASE DE DATOS EN MEMORIA (ESTADO CENTRALIZADO) ---
+        let clientes = [
+            { id: 1, nombre: "Juan Pérez", telefono: "+34 600 123 456" },
+            { id: 2, nombre: "María López", telefono: "+34 600 654 321" }
+        ];
+
+        let proveedores = [
+            { id: 1, nombre: "Suministros Ofi S.L.", telefono: "+34 912 345 678", correo: "ventas@suministrosofi.es" },
+            { id: 2, nombre: "Iberdrola", telefono: "+34 900 225 235", correo: "empresas@iberdrola.es" }
+        ];
+
+        let pagos = [
+            { id: 1, fecha: "2026-06-10", proveedor: "Iberdrola", concepto: "Factura Luz", forma: "Transferencia", importe: 150.00, estado: "Pagado" }
+        ];
+
+        let ingresos = [
+            { id: 1, fecha: "2026-06-01", cliente: "Juan Pérez", concepto: "Proyecto A", forma: "Bizum", importe: 1200.00, estado: "Cobrado" }
+        ];
+
+        // Variable global para controlar qué ID estamos editando (null = creando nuevo)
+        let editId = null;
+
+        // --- NAVEGACIÓN DE PESTAÑAS ---
         function openTab(evt, tabName) {
             var contenidos = document.getElementsByClassName("tab-content");
-            for (var i = 0; i < contenidos.length; i++) {
-                contenidos[i].style.display = "none";
-            }
+            for (var i = 0; i < contenidos.length; i++) { contenidos[i].style.display = "none"; }
             var botones = document.getElementsByClassName("tab-links");
-            for (var i = 0; i < botones.length; i++) {
-                botones[i].classList.remove("active");
-            }
+            for (var i = 0; i < botones.length; i++) { botones[i].classList.remove("active"); }
             document.getElementById(tabName).style.display = "block";
             evt.currentTarget.classList.add("active");
         }
 
-        // --- EXPORTAR A EXCEL ---
-        function exportarTodoAExcel() {
-            var wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.table_to_sheet(document.getElementById("tablaClientes")), "Clientes");
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.table_to_sheet(document.getElementById("tablaProveedores")), "Proveedores");
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.table_to_sheet(document.getElementById("tablaPagos")), "Pagos");
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.table_to_sheet(document.getElementById("tablaIngresos")), "Ingresos");
-            XLSX.writeFile(wb, "Gestion_de_Empresa.xlsx");
+        // --- FUNCIONES DE RENDERIZADO Y ACTUALIZACIÓN DE CONTADORES ---
+        function renderAll() {
+            renderClientes();
+            renderProveedores();
+            renderPagos();
+            renderIngresos();
         }
 
-        // --- MODALES ---
-        function cerrarModal(id) {
-            document.getElementById(id).style.display = "none";
+        function renderClientes() {
+            const tbody = document.querySelector("#tablaClientes tbody");
+            tbody.innerHTML = "";
+            clientes.forEach(c => {
+                tbody.insertAdjacentHTML('beforeend', `
+                    <tr>
+                        <td>${c.nombre}</td>
+                        <td>${c.telefono}</td>
+                        <td>
+                            <button class="btn-action btn-edit" onclick="abrirModalCliente(${c.id})">✏️ Editar</button>
+                            <button class="btn-action btn-delete" onclick="eliminarCliente(${c.id})">❌ Borrar</button>
+                        </td>
+                    </tr>
+                `);
+            });
+            document.getElementById("badge-clientes").innerText = clientes.length;
+            document.getElementById("title-clientes").innerText = `(${clientes.length})`;
         }
 
-        function cargarOpcionesSelect(idTabla, idSelect) {
+        function renderProveedores() {
+            const tbody = document.querySelector("#tablaProveedores tbody");
+            tbody.innerHTML = "";
+            proveedores.forEach(p => {
+                tbody.insertAdjacentHTML('beforeend', `
+                    <tr>
+                        <td>${p.nombre}</td>
+                        <td>${p.telefono}</td>
+                        <td>${p.correo}</td>
+                        <td>
+                            <button class="btn-action btn-edit" onclick="abrirModalProveedor(${p.id})">✏️ Editar</button>
+                            <button class="btn-action btn-delete" onclick="eliminarProveedor(${p.id})">❌ Borrar</button>
+                        </td>
+                    </tr>
+                `);
+            });
+            document.getElementById("badge-proveedores").innerText = proveedores.length;
+            document.getElementById("title-proveedores").innerText = `(${proveedores.length})`;
+        }
+
+        function renderPagos() {
+            const tbody = document.querySelector("#tablaPagos tbody");
+            tbody.innerHTML = "";
+            pagos.forEach(p => {
+                let claseEst = (p.estado === "Pagado") ? "status-paid" : "status-pending";
+                tbody.insertAdjacentHTML('beforeend', `
+                    <tr>
+                        <td>${p.fecha}</td>
+                        <td>${p.concepto} - ${p.proveedor}</td>
+                        <td>${p.forma}</td>
+                        <td>${parseFloat(p.importe).toFixed(2)} €</td>
+                        <td class="${claseEst}">${p.estado}</td>
+                        <td>
+                            <button class="btn-action btn-edit" onclick="abrirModalPago(${p.id})">✏️ Editar</button>
+                            <button class="btn-action btn-delete" onclick="eliminarPago(${p.id})">❌ Borrar</button>
+                        </td>
+                    </tr>
+                `);
+            });
+            document.getElementById("badge-pagos").innerText = pagos.length;
+            document.getElementById("title-pagos").innerText = `(${pagos.length})`;
+        }
+
+        function renderIngresos() {
+            const tbody = document.querySelector("#tablaIngresos tbody");
+            tbody.innerHTML = "";
+            ingresos.forEach(i => {
+                let claseEst = (i.estado === "Cobrado") ? "status-paid" : "status-pending";
+                tbody.insertAdjacentHTML('beforeend', `
+                    <tr>
+                        <td>${i.fecha}</td>
+                        <td>${i.cliente} - ${i.concepto}</td>
+                        <td>${i.forma}</td>
+                        <td>${parseFloat(i.importe).toFixed(2)} €</td>
+                        <td class="${claseEst}">${i.estado}</td>
+                        <td>
+                            <button class="btn-action btn-edit" onclick="abrirModalIngreso(${i.id})">✏️ Editar</button>
+                            <button class="btn-action btn-delete" onclick="eliminarIngreso(${i.id})">❌ Borrar</button>
+                        </td>
+                    </tr>
+                `);
+            });
+            document.getElementById("badge-ingresos").innerText = ingresos.length;
+            document.getElementById("title-ingresos").innerText = `(${ingresos.length})`;
+        }
+
+        // --- CARGAR SELECTS DESDE EL ESTADO ---
+        function cargarOpcionesSelect(origenDatos, idSelect) {
             var select = document.getElementById(idSelect);
             select.innerHTML = "";
-            var filas = document.querySelectorAll("#" + idTabla + " tbody tr");
-            
-            if(filas.length === 0) {
+            if(origenDatos.length === 0) {
                 var opcion = document.createElement("option");
                 opcion.value = "";
                 opcion.text = "No hay registros disponibles...";
                 select.appendChild(opcion);
                 return;
             }
-
-            filas.forEach(function(fila) {
-                var nombre = fila.cells[0].innerText;
+            origenDatos.forEach(function(item) {
                 var opcion = document.createElement("option");
-                opcion.value = nombre;
-                opcion.text = nombre;
+                opcion.value = item.nombre;
+                opcion.text = item.nombre;
                 select.appendChild(opcion);
             });
         }
 
-        // --- CLIENTES ---
-        function abrirModalCliente() {
-            document.getElementById('inputCliNombre').value = "";
-            document.getElementById('inputCliTel').value = "";
+        // --- MODALES GENERALES ---
+        function cerrarModal(id) { document.getElementById(id).style.display = "none"; editId = null; }
+
+        // --- LÓGICA: CLIENTES (AÑADIR / MODIFICAR / ELIMINAR) ---
+        function abrirModalCliente(id = null) {
+            editId = id;
+            if(id) {
+                let c = clientes.find(x => x.id === id);
+                document.getElementById('inputCliNombre').value = c.nombre;
+                document.getElementById('inputCliTel').value = c.telefono;
+                document.getElementById('modalClienteTitle').innerText = "Modificar Cliente";
+                document.getElementById('btnGuardarCliente').innerText = "Actualizar";
+            } else {
+                document.getElementById('inputCliNombre').value = "";
+                document.getElementById('inputCliTel').value = "";
+                document.getElementById('modalClienteTitle').innerText = "Nuevo Cliente";
+                document.getElementById('btnGuardarCliente').innerText = "Guardar";
+            }
             document.getElementById('modalCliente').style.display = "block";
         }
 
@@ -338,86 +462,21 @@
             var tel = document.getElementById('inputCliTel').value;
             if (!nom || !tel) return alert("Rellena todos los campos");
             
-            var tbody = document.querySelector("#tablaClientes tbody");
-            tbody.insertAdjacentHTML('beforeend', `<tr><td>${nom}</td><td>${tel}</td></tr>`);
+            if(editId) {
+                let c = clientes.find(x => x.id === editId);
+                c.nombre = nom; c.telefono = tel;
+            } else {
+                clientes.push({ id: Date.now(), nombre: nom, telefono: tel });
+            }
             cerrarModal('modalCliente');
+            renderClientes();
         }
 
-        // --- PROVEEDORES ---
-        function abrirModalProveedor() {
-            document.getElementById('inputProvNombre').value = "";
-            document.getElementById('inputProvTel').value = "";
-            document.getElementById('inputProvEmail').value = "";
-            document.getElementById('modalProveedor').style.display = "block";
+        function eliminarCliente(id) {
+            if(confirm("¿Estás seguro de eliminar este cliente?")) {
+                clientes = clientes.filter(x => x.id !== id);
+                renderClientes();
+            }
         }
 
-        function guardarProveedor() {
-            var nom = document.getElementById('inputProvNombre').value;
-            var tel = document.getElementById('inputProvTel').value;
-            var email = document.getElementById('inputProvEmail').value;
-            if (!nom || !tel || !email) return alert("Rellena todos los campos");
-            
-            var tbody = document.querySelector("#tablaProveedores tbody");
-            tbody.insertAdjacentHTML('beforeend', `<tr><td>${nom}</td><td>${tel}</td><td>${email}</td></tr>`);
-            cerrarModal('modalProveedor');
-        }
-
-        // --- PAGOS (GASTOS) ---
-        function abrirModalPago() {
-            document.getElementById('inputPagoFecha').valueAsDate = new Date();
-            document.getElementById('inputPagoConcepto').value = "";
-            document.getElementById('inputPagoImporte').value = "";
-            cargarOpcionesSelect("tablaProveedores", "selectPagoProveedor");
-            document.getElementById('modalPago').style.display = "block";
-        }
-
-        function guardarPago() {
-            var fecha = document.getElementById('inputPagoFecha').value;
-            var prov = document.getElementById('selectPagoProveedor').value;
-            var conc = document.getElementById('inputPagoConcepto').value;
-            var forma = document.getElementById('selectPagoForma').value; // Captura Forma de Pago
-            var imp = document.getElementById('inputPagoImporte').value;
-            var est = document.getElementById('selectPagoEstado').value;
-
-            if (!fecha || !prov || !conc || !imp) return alert("Rellena todos los campos");
-
-            var claseEstado = (est === "Pagado") ? "status-paid" : "status-pending";
-            var textoConcepto = conc + " - " + prov;
-
-            var tbody = document.querySelector("#tablaPagos tbody");
-            // Insertado el dato de 'forma' en una nueva celda <td>
-            tbody.insertAdjacentHTML('beforeend', `<tr><td>${fecha}</td><td>${textoConcepto}</td><td>${forma}</td><td>${parseFloat(imp).toFixed(2)} €</td><td class="${claseEstado}">${est}</td></tr>`);
-            cerrarModal('modalPago');
-        }
-
-        // --- INGRESOS ---
-        function abrirModalIngreso() {
-            document.getElementById('inputIngresoFecha').valueAsDate = new Date();
-            document.getElementById('inputIngresoConcepto').value = "";
-            document.getElementById('inputIngresoImporte').value = "";
-            cargarOpcionesSelect("tablaClientes", "selectIngresoCliente");
-            document.getElementById('modalIngreso').style.display = "block";
-        }
-
-        function guardarIngreso() {
-            var fecha = document.getElementById('inputIngresoFecha').value;
-            var cli = document.getElementById('selectIngresoCliente').value;
-            var conc = document.getElementById('inputIngresoConcepto').value;
-            var forma = document.getElementById('selectIngresoForma').value; // Captura Forma de Pago
-            var imp = document.getElementById('inputIngresoImporte').value;
-            var est = document.getElementById('selectIngresoEstado').value;
-
-            if (!fecha || !cli || !conc || !imp) return alert("Rellena todos los campos");
-
-            var claseEstado = (est === "Cobrado") ? "status-paid" : "status-pending";
-            var textoConcepto = cli + " - " + conc;
-
-            var tbody = document.querySelector("#tablaIngresos tbody");
-            // Insertado el dato de 'forma' en una nueva celda <td>
-            tbody.insertAdjacentHTML('beforeend', `<tr><td>${fecha}</td><td>${textoConcepto}</td><td>${forma}</td><td>${parseFloat(imp).toFixed(2)} €</td><td class="${claseEstado}">${est}</td></tr>`);
-            cerrarModal('modalIngreso');
-        }
-    </script>
-
-</body>
-</html>
+        // ---
