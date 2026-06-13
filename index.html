@@ -33,16 +33,39 @@
         }
         .btn-export-excel:hover { background-color: #0c5e31; }
 
-        .tab-menu { display: flex; justify-content: center; background-color: var(--secondary-color); flex-wrap: wrap; }
+        /* Menú vertical fijo */
+        .tab-menu { 
+            display: flex;
+            flex-direction: column; 
+            background-color: var(--secondary-color); 
+            max-width: 1000px;
+            margin: 2rem auto 0 auto; 
+            border-radius: 8px 8px 0 0; 
+        }
+        
         .tab-menu button {
             background-color: inherit; color: white; border: none; outline: none;
-            cursor: pointer; padding: 14px 24px; font-size: 16px; transition: 0.3s;
+            cursor: pointer; padding: 14px 20px; font-size: 16px; transition: 0.3s;
+            text-align: left; 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
+            width: 100%;
+            box-sizing: border-box;
         }
-        .tab-menu button:hover, .tab-menu button.active { background-color: var(--accent-color); font-weight: bold; }
+        
+        .tab-menu button:last-child {
+            border-bottom: none;
+        }
+
+        .tab-menu button:hover, .tab-menu button.active { 
+            background-color: var(--accent-color); 
+            font-weight: bold; 
+            padding-left: 25px; 
+        }
 
         .container {
-            max-width: 1000px; margin: 2rem auto; background: white; padding: 2rem;
-            border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-width: 1000px; margin: 0 auto 2rem auto; background: white; padding: 2rem;
+            border-radius: 0 0 8px 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-sizing: border-box;
         }
 
         .tab-content { display: none; animation: fadeIn 0.5s; }
@@ -64,7 +87,7 @@
         .status-paid { color: #27ae60; font-weight: bold; }
         .status-pending { color: #e67e22; font-weight: bold; }
 
-        /* Estilos para las ventanas emergentes (Modales) */
+        /* Modales */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
         .modal-content { background-color: white; margin: 5% auto; padding: 25px; border-radius: 8px; width: 320px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         .modal-content h3 { margin-top: 0; color: var(--primary-color); }
@@ -86,19 +109,19 @@
     </header>
 
     <div class="tab-menu">
-        <button class="tab-links active" onclick="openTab(event, 'Contactos')">Lista de Contactos</button>
-        <button class="tab-links" onclick="openTab(event, 'Proveedores')">Lista de Proveedores</button>
-        <button class="tab-links" onclick="openTab(event, 'Pagos')">Relación de Pagos</button>
-        <button class="tab-links" onclick="openTab(event, 'Ingresos')">Relación de Ingresos</button>
+        <button class="tab-links active" onclick="openTab(event, 'Clientes')">Lista de clientes</button>
+        <button class="tab-links" onclick="openTab(event, 'Proveedores')">Lista de proveedores</button>
+        <button class="tab-links" onclick="openTab(event, 'Pagos')">Relación de pagos</button>
+        <button class="tab-links" onclick="openTab(event, 'Ingresos')">Relación de ingresos</button>
     </div>
 
     <div class="container">
-        <div id="Contactos" class="tab-content" style="display: block;">
+        <div id="Clientes" class="tab-content" style="display: block;">
             <div class="header-section">
-                <h2>Directorio de Contactos</h2>
-                <button class="btn-add" onclick="abrirModalContacto()">+ Añadir Contacto</button>
+                <h2>Directorio de Clientes</h2>
+                <button class="btn-add" onclick="abrirModalCliente()">+ Añadir Cliente</button>
             </div>
-            <table id="tablaContactos">
+            <table id="tablaClientes">
                 <thead>
                     <tr><th>Nombre</th><th>Teléfono</th></tr>
                 </thead>
@@ -132,10 +155,10 @@
             </div>
             <table id="tablaPagos">
                 <thead>
-                    <tr><th>Fecha</th><th>Concepto / Proveedor</th><th>Importe</th><th>Estado</th></tr>
+                    <tr><th>Fecha</th><th>Concepto / Proveedor</th><th>Forma de Pago</th><th>Importe</th><th>Estado</th></tr>
                 </thead>
                 <tbody>
-                    <tr><td>2026-06-10</td><td>Factura Luz - Iberdrola</td><td>150.00 €</td><td class="status-paid">Pagado</td></tr>
+                    <tr><td>2026-06-10</td><td>Factura Luz - Iberdrola</td><td>Transferencia</td><td>150.00 €</td><td class="status-paid">Pagado</td></tr>
                 </tbody>
             </table>
         </div>
@@ -147,23 +170,23 @@
             </div>
             <table id="tablaIngresos">
                 <thead>
-                    <tr><th>Fecha</th><th>Cliente / Concepto</th><th>Importe</th><th>Estado</th></tr>
+                    <tr><th>Fecha</th><th>Cliente / Concepto</th><th>Forma de Pago</th><th>Importe</th><th>Estado</th></tr>
                 </thead>
                 <tbody>
-                    <tr><td>2026-06-01</td><td>Juan Pérez - Proyecto A</td><td>1200.00 €</td><td class="status-paid">Cobrado</td></tr>
+                    <tr><td>2026-06-01</td><td>Juan Pérez - Proyecto A</td><td>Bizum</td><td>1200.00 €</td><td class="status-paid">Cobrado</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <div id="modalContacto" class="modal">
+    <div id="modalCliente" class="modal">
         <div class="modal-content">
-            <h3>Nuevo Contacto</h3>
-            <div class="form-group"><label>Nombre:</label><input type="text" id="inputContNombre" placeholder="Ej. Carlos Martínez"></div>
-            <div class="form-group"><label>Teléfono:</label><input type="text" id="inputContTel" placeholder="Ej. 600 000 000"></div>
+            <h3>Nuevo Cliente</h3>
+            <div class="form-group"><label>Nombre:</label><input type="text" id="inputCliNombre" placeholder="Ej. Carlos Martínez"></div>
+            <div class="form-group"><label>Teléfono:</label><input type="text" id="inputCliTel" placeholder="Ej. 600 000 000"></div>
             <div class="modal-buttons">
-                <button class="btn-cancel" onclick="cerrarModal('modalContacto')">Cancelar</button>
-                <button class="btn-add" onclick="guardarContacto()">Guardar</button>
+                <button class="btn-cancel" onclick="cerrarModal('modalCliente')">Cancelar</button>
+                <button class="btn-add" onclick="guardarCliente()">Guardar</button>
             </div>
         </div>
     </div>
@@ -189,7 +212,18 @@
                 <label>Proveedor:</label>
                 <select id="selectPagoProveedor"></select>
             </div>
-            <div class="form-group"><label>Concepto (Ej. Factura luz):</label><input type="text" id="inputPagoConcepto"></div>
+            <div class="form-group"><label>Concepto:</label><input type="text" id="inputPagoConcepto"></div>
+            
+            <div class="form-group">
+                <label>Forma de Pago:</label>
+                <select id="selectPagoForma">
+                    <option value="Tarjeta">Tarjeta</option>
+                    <option value="Bizum">Bizum</option>
+                    <option value="Efectivo">Efectivo</option>
+                    <option value="Transferencia">Transferencia</option>
+                </select>
+            </div>
+
             <div class="form-group"><label>Importe (€):</label><input type="number" step="0.01" id="inputPagoImporte"></div>
             <div class="form-group">
                 <label>Estado:</label>
@@ -210,10 +244,21 @@
             <h3>Registrar Ingreso</h3>
             <div class="form-group"><label>Fecha:</label><input type="date" id="inputIngresoFecha"></div>
             <div class="form-group">
-                <label>Cliente (Contacto):</label>
+                <label>Cliente:</label>
                 <select id="selectIngresoCliente"></select>
             </div>
-            <div class="form-group"><label>Concepto (Ej. Consultoría):</label><input type="text" id="inputIngresoConcepto"></div>
+            <div class="form-group"><label>Concepto:</label><input type="text" id="inputIngresoConcepto"></div>
+            
+            <div class="form-group">
+                <label>Forma de Pago:</label>
+                <select id="selectIngresoForma">
+                    <option value="Tarjeta">Tarjeta</option>
+                    <option value="Bizum">Bizum</option>
+                    <option value="Efectivo">Efectivo</option>
+                    <option value="Transferencia">Transferencia</option>
+                </select>
+            </div>
+
             <div class="form-group"><label>Importe (€):</label><input type="number" step="0.01" id="inputIngresoImporte"></div>
             <div class="form-group">
                 <label>Estado:</label>
@@ -230,31 +275,24 @@
     </div>
 
     <script>
-        // --- NUEVA FUNCIÓN CORREGIDA Y CORRECCIÓN DE NAVEGACIÓN ---
+        // --- NAVEGACIÓN ---
         function openTab(evt, tabName) {
-            // 1. Ocultar todos los bloques de contenido
             var contenidos = document.getElementsByClassName("tab-content");
             for (var i = 0; i < contenidos.length; i++) {
                 contenidos[i].style.display = "none";
             }
-
-            // 2. Quitar la propiedad "active" de todos los botones de forma segura
             var botones = document.getElementsByClassName("tab-links");
             for (var i = 0; i < botones.length; i++) {
                 botones[i].classList.remove("active");
             }
-
-            // 3. Mostrar el bloque de la pestaña seleccionada
             document.getElementById(tabName).style.display = "block";
-
-            // 4. Marcar el botón actual como activo usando classList (evita errores de texto)
             evt.currentTarget.classList.add("active");
         }
 
         // --- EXPORTAR A EXCEL ---
         function exportarTodoAExcel() {
             var wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.table_to_sheet(document.getElementById("tablaContactos")), "Contactos");
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.table_to_sheet(document.getElementById("tablaClientes")), "Clientes");
             XLSX.utils.book_append_sheet(wb, XLSX.utils.table_to_sheet(document.getElementById("tablaProveedores")), "Proveedores");
             XLSX.utils.book_append_sheet(wb, XLSX.utils.table_to_sheet(document.getElementById("tablaPagos")), "Pagos");
             XLSX.utils.book_append_sheet(wb, XLSX.utils.table_to_sheet(document.getElementById("tablaIngresos")), "Ingresos");
@@ -288,21 +326,21 @@
             });
         }
 
-        // --- CONTACTOS ---
-        function abrirModalContacto() {
-            document.getElementById('inputContNombre').value = "";
-            document.getElementById('inputContTel').value = "";
-            document.getElementById('modalContacto').style.display = "block";
+        // --- CLIENTES ---
+        function abrirModalCliente() {
+            document.getElementById('inputCliNombre').value = "";
+            document.getElementById('inputCliTel').value = "";
+            document.getElementById('modalCliente').style.display = "block";
         }
 
-        function guardarContacto() {
-            var nom = document.getElementById('inputContNombre').value;
-            var tel = document.getElementById('inputContTel').value;
+        function guardarCliente() {
+            var nom = document.getElementById('inputCliNombre').value;
+            var tel = document.getElementById('inputCliTel').value;
             if (!nom || !tel) return alert("Rellena todos los campos");
             
-            var tbody = document.querySelector("#tablaContactos tbody");
+            var tbody = document.querySelector("#tablaClientes tbody");
             tbody.insertAdjacentHTML('beforeend', `<tr><td>${nom}</td><td>${tel}</td></tr>`);
-            cerrarModal('modalContacto');
+            cerrarModal('modalCliente');
         }
 
         // --- PROVEEDORES ---
@@ -337,6 +375,7 @@
             var fecha = document.getElementById('inputPagoFecha').value;
             var prov = document.getElementById('selectPagoProveedor').value;
             var conc = document.getElementById('inputPagoConcepto').value;
+            var forma = document.getElementById('selectPagoForma').value; // Captura Forma de Pago
             var imp = document.getElementById('inputPagoImporte').value;
             var est = document.getElementById('selectPagoEstado').value;
 
@@ -346,7 +385,8 @@
             var textoConcepto = conc + " - " + prov;
 
             var tbody = document.querySelector("#tablaPagos tbody");
-            tbody.insertAdjacentHTML('beforeend', `<tr><td>${fecha}</td><td>${textoConcepto}</td><td>${parseFloat(imp).toFixed(2)} €</td><td class="${claseEstado}">${est}</td></tr>`);
+            // Insertado el dato de 'forma' en una nueva celda <td>
+            tbody.insertAdjacentHTML('beforeend', `<tr><td>${fecha}</td><td>${textoConcepto}</td><td>${forma}</td><td>${parseFloat(imp).toFixed(2)} €</td><td class="${claseEstado}">${est}</td></tr>`);
             cerrarModal('modalPago');
         }
 
@@ -355,7 +395,7 @@
             document.getElementById('inputIngresoFecha').valueAsDate = new Date();
             document.getElementById('inputIngresoConcepto').value = "";
             document.getElementById('inputIngresoImporte').value = "";
-            cargarOpcionesSelect("tablaContactos", "selectIngresoCliente");
+            cargarOpcionesSelect("tablaClientes", "selectIngresoCliente");
             document.getElementById('modalIngreso').style.display = "block";
         }
 
@@ -363,6 +403,7 @@
             var fecha = document.getElementById('inputIngresoFecha').value;
             var cli = document.getElementById('selectIngresoCliente').value;
             var conc = document.getElementById('inputIngresoConcepto').value;
+            var forma = document.getElementById('selectIngresoForma').value; // Captura Forma de Pago
             var imp = document.getElementById('inputIngresoImporte').value;
             var est = document.getElementById('selectIngresoEstado').value;
 
@@ -372,7 +413,8 @@
             var textoConcepto = cli + " - " + conc;
 
             var tbody = document.querySelector("#tablaIngresos tbody");
-            tbody.insertAdjacentHTML('beforeend', `<tr><td>${fecha}</td><td>${textoConcepto}</td><td>${parseFloat(imp).toFixed(2)} €</td><td class="${claseEstado}">${est}</td></tr>`);
+            // Insertado el dato de 'forma' en una nueva celda <td>
+            tbody.insertAdjacentHTML('beforeend', `<tr><td>${fecha}</td><td>${textoConcepto}</td><td>${forma}</td><td>${parseFloat(imp).toFixed(2)} €</td><td class="${claseEstado}">${est}</td></tr>`);
             cerrarModal('modalIngreso');
         }
     </script>
