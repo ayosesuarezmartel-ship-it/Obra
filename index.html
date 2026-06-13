@@ -3,304 +3,300 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión Pro - Eléctricas Centro S.L</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>Panel de Gestión de Empresa</title>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
     <style>
         :root {
-            --primary: #2563eb; --success: #10b981; --danger: #ef4444;
-            --warning: #f59e0b; --bg: #f8fafc; --white: #ffffff;
-            --text-main: #1e293b; --text-muted: #64748b; --radius: 12px;
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #3498db;
+            --bg-color: #f4f7f6;
+            --text-color: #333;
         }
 
-        @media (prefers-color-scheme: dark) {
-            :root { --bg: #0f172a; --white: #1e293b; --text-main: #f8fafc; --text-muted: #94a3b8; }
-            input, textarea, select { background: #1e293b; color: white; border-color: #334155 !important; }
-            .card-resumen, .tarea-contenedor, .modal-content { background: #1e293b !important; border-color: #444 !important; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
         }
 
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text-main); margin: 0; padding: 15px; }
-        .container { max-width: 500px; margin: auto; }
+        /* Encabezado corregido para evitar solapamientos */
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1.5rem 2rem;
+            display: block;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0 0 1rem 0;
+            font-size: 24px;
+        }
+
+        /* Botón general de Exportar a Excel recolocado de forma segura */
+        .btn-export-excel {
+            display: inline-block;
+            background-color: #107c41; /* Verde Excel */
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background-color 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .btn-export-excel:hover {
+            background-color: #0c5e31;
+        }
+
+        /* Navegación por pestañas */
+        .tab-menu {
+            display: flex;
+            justify-content: center;
+            background-color: var(--secondary-color);
+            flex-wrap: wrap;
+        }
+
+        .tab-menu button {
+            background-color: inherit;
+            color: white;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 24px;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        .tab-menu button:hover {
+            background-color: var(--accent-color);
+        }
+
+        .tab-menu button.active {
+            background-color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        /* Contenido principal */
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from {opacity: 0;}
+            to {opacity: 1;}
+        }
+
+        /* Tablas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        table th, table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        table th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        table tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Botones de acción dentro de las pestañas */
+        .btn-add {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .btn-add:hover {
+            background-color: #219150;
+        }
+
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
         
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .header h1 { font-size: 1.3rem; color: var(--primary); margin: 0; }
-
-        /* MODAL */
-        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
-        .modal-content { background: white; margin: 15% auto; padding: 20px; width: 85%; max-width: 400px; border-radius: var(--radius); position: relative; }
-
-        /* FILTRO RÁPIDO */
-        .filtro-operario { margin-bottom: 15px; background: #e0e7ff; padding: 10px; border-radius: 8px; border: 1px solid #c7d2fe; }
-        .filtro-operario select { width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #a5b4fc; font-weight: 600; color: #4338ca; }
-
-        /* TAREAS */
-        .tarea-contenedor { background: var(--white); border: 1px solid #e2e8f0; border-radius: var(--radius); padding: 12px; margin-bottom: 15px; }
-        .tarea-resaltada { border: 2px solid var(--primary); box-shadow: 0 0 10px rgba(37, 99, 235, 0.2); }
-        .tarea-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-        .tarea-header span { flex: 1; font-weight: 600; }
-        
-        .select-op { font-size: 0.75rem; padding: 4px; border-radius: 4px; border: 1px solid #ddd; width: 100%; margin-top: 5px; background: #f9fafb; }
-
-        .material-list { margin-left: 25px; border-left: 2px solid #eee; padding-left: 10px; }
-        .material-item { display: flex; justify-content: space-between; font-size: 0.8rem; padding: 3px 0; color: var(--text-muted); }
-
-        .btn-add { background: var(--primary); color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .btn-op { background: #6366f1; font-size: 0.7rem; color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        
-        .card-resumen { background: var(--white); padding: 15px; border-radius: var(--radius); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #e2e8f0; }
-        .completada { text-decoration: line-through; opacity: 0.5; }
-        .btn-del { background: none; border: none; color: #ccc; cursor: pointer; font-size: 0.85rem; }
-        textarea { width: 100%; border: 1px solid #ddd; border-radius: 8px; padding: 10px; font-family: inherit; margin-bottom: 10px; box-sizing: border-box; }
-        
-        .pantalla { display: none; }
-        .pantalla.activa { display: block; }
+        .status-paid { color: #27ae60; font-weight: bold; }
+        .status-pending { color: #e67e22; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <h1>CONTROL DE OBRAS</h1>
-        <button class="btn-op" onclick="abrirModal()">👥 PLANTILLA</button>
+    <header>
+        <h1>Sistema de Gestión Empresarial</h1>
+        <button class="btn-export-excel" onclick="exportarTodoAExcel()">📥 Exportar todo a Excel</button>
+    </header>
+
+    <div class="tab-menu">
+        <button class="tab-links active" onclick="openTab(event, 'Contactos')">Lista de Contactos</button>
+        <button class="tab-links" onclick="openTab(event, 'Pagos')">Relación de Pagos</button>
+        <button class="tab-links" onclick="openTab(event, 'Ingresos')">Relación de Ingresos</button>
     </div>
 
-    <div id="pantallaListado" class="pantalla activa">
-        <div class="filtro-operario">
-            <label style="font-size: 0.65rem; font-weight: 800; color: #4338ca; display: block; margin-bottom: 4px;">FILTRAR POR OPERARIO ASIGNADO:</label>
-            <select id="filtroGlobal" onchange="renderListado()">
-                <option value="TODOS">--- Ver todos los operarios ---</option>
-            </select>
-        </div>
-
-        <div style="display:flex; gap:5px; margin-bottom:15px">
-            <input type="text" id="nuevoNombreObra" placeholder="Nombre de obra..." style="flex:1; padding:10px; border-radius:8px; border:1px solid #ddd">
-            <button class="btn-add" onclick="crearObra()">CREAR</button>
-        </div>
-        <div id="listaObras"></div>
-    </div>
-
-    <div id="pantallaDetalle" class="pantalla">
-        <button onclick="irAListado()" style="background:none; border:none; color:var(--primary); font-weight:bold; cursor:pointer; margin-bottom:15px">← VOLVER AL LISTADO</button>
-        <div id="contenidoDetalle"></div>
-    </div>
-</div>
-
-<div id="modalOperarios" class="modal">
-    <div class="modal-content">
-        <h3 style="margin-top:0">Gestionar Equipo</h3>
-        <div style="display:flex; gap:5px; margin-bottom:15px">
-            <input type="text" id="nombreOperario" placeholder="Nombre..." style="flex:1; padding:8px; border-radius:5px; border:1px solid #ddd">
-            <button class="btn-add" onclick="agregarOperario()">+</button>
-        </div>
-        <div id="listaOperariosModal" style="max-height: 200px; overflow-y: auto;"></div>
-        <button onclick="cerrarModal()" style="width:100%; margin-top:15px; padding:10px; border:none; border-radius:8px; background:#444; color:white; cursor:pointer">Guardar y Cerrar</button>
-    </div>
-</div>
-
-<script>
-    let obras = JSON.parse(localStorage.getItem('obras_v5')) || [];
-    let operarios = JSON.parse(localStorage.getItem('operarios_v5')) || ["Sin asignar"];
-    let idObraActual = null;
-
-    function guardar() { 
-        localStorage.setItem('obras_v5', JSON.stringify(obras)); 
-        localStorage.setItem('operarios_v5', JSON.stringify(operarios));
-    }
-
-    // MODAL Y PLANTILLA
-    function abrirModal() { document.getElementById('modalOperarios').style.display = 'block'; renderOperarios(); }
-    function cerrarModal() { 
-        document.getElementById('modalOperarios').style.display = 'none'; 
-        actualizarSelectFiltro();
-        if(idObraActual) renderDetalle(); 
-        else renderListado();
-    }
-    
-    function agregarOperario() {
-        const nom = document.getElementById('nombreOperario').value.trim();
-        if(nom && !operarios.includes(nom)) {
-            operarios.push(nom);
-            document.getElementById('nombreOperario').value = '';
-            guardar(); renderOperarios();
-        }
-    }
-
-    function borrarOperario(nom) {
-        if(nom === "Sin asignar") return;
-        if(confirm(`¿Eliminar a ${nom} de la plantilla?`)) {
-            operarios = operarios.filter(o => o !== nom);
-            guardar(); renderOperarios();
-        }
-    }
-
-    function renderOperarios() {
-        const cont = document.getElementById('listaOperariosModal');
-        cont.innerHTML = operarios.map(o => `
-            <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee">
-                <span>${o}</span>
-                ${o !== "Sin asignar" ? `<button class="btn-del" onclick="borrarOperario('${o}')" style="color:var(--danger)">✕</button>` : ''}
-            </div>`).join('');
-    }
-
-    function actualizarSelectFiltro() {
-        const sel = document.getElementById('filtroGlobal');
-        const valAnterior = sel.value;
-        sel.innerHTML = '<option value="TODOS">--- Ver todos los operarios ---</option>' + 
-            operarios.map(o => `<option value="${o}">${o}</option>`).join('');
-        sel.value = operarios.includes(valAnterior) ? valAnterior : "TODOS";
-    }
-
-    // OBRAS Y LISTADO
-    function crearObra() {
-        const input = document.getElementById('nuevoNombreObra');
-        if (!input.value.trim()) return;
-        obras.push({ id: Date.now(), nombre: input.value, prioridad: 1, tareas: [], notas: "" });
-        input.value = ''; guardar(); renderListado();
-    }
-
-    function renderListado() {
-        const cont = document.getElementById('listaObras');
-        const filtro = document.getElementById('filtroGlobal').value;
-        cont.innerHTML = '';
-        
-        const filtradas = obras.filter(o => {
-            if(filtro === "TODOS") return true;
-            return o.tareas.some(t => t.responsable === filtro);
-        });
-
-        filtradas.forEach(o => {
-            const total = o.tareas.length;
-            const misTareas = o.tareas.filter(t => t.responsable === filtro).length;
-            const labelSub = filtro === "TODOS" ? `${total} tareas totales` : `${misTareas} tareas para ${filtro}`;
-
-            cont.innerHTML += `
-                <div class="card-resumen" onclick="irADetalle(${o.id})">
-                    <div>
-                        <strong style="font-size:1rem">${o.nombre}</strong><br>
-                        <small style="color:var(--text-muted)">${labelSub}</small>
-                    </div>
-                    <div style="color:var(--primary); font-weight:800">VER →</div>
-                </div>`;
-        });
-        if(filtradas.length === 0) cont.innerHTML = '<p style="text-align:center; color:var(--text-muted); margin-top:20px">No hay obras con estos criterios.</p>';
-    }
-
-    function renderDetalle() {
-        const obra = obras.find(o => o.id === idObraActual);
-        const cont = document.getElementById('contenidoDetalle');
-        const filtro = document.getElementById('filtroGlobal').value;
-        
-        const tareasHTML = obra.tareas.map(t => {
-            const esMia = (filtro === "TODOS" || t.responsable === filtro);
-            const matsHTML = t.materiales.map(m => `
-                <div class="material-item"><span>• ${m.texto}</span><button class="btn-del" onclick="borrarMaterial(${t.id}, ${m.id})">✕</button></div>
-            `).join('');
-
-            const opsOptions = operarios.map(op => `<option value="${op}" ${t.responsable === op ? 'selected' : ''}>${op}</option>`).join('');
-
-            return `
-            <div class="tarea-contenedor ${esMia && filtro !== 'TODOS' ? 'tarea-resaltada' : ''}">
-                <div class="tarea-header">
-                    <input type="checkbox" ${t.hecha ? 'checked' : ''} onchange="toggleTarea(${t.id})">
-                    <span class="${t.hecha ? 'completada' : ''}">${t.texto}</span>
-                    <button class="btn-del" onclick="borrarTarea(${t.id})">✕</button>
-                </div>
-                <div style="margin-left:25px; margin-bottom:10px">
-                    <select class="select-op" onchange="asignarOperario(${t.id}, this.value)">${opsOptions}</select>
-                </div>
-                <div class="material-list">${matsHTML}
-                    <div style="display:flex; gap:5px; margin-top:8px">
-                        <input type="text" id="inMat-${t.id}" placeholder="Nuevo material..." style="flex:1; font-size:0.75rem; padding:6px; border:1px solid #ddd; border-radius:4px">
-                        <button onclick="agregarMaterial(${t.id})" style="background:var(--success); color:white; border:none; padding:4px 10px; border-radius:4px; font-weight:bold">+</button>
-                    </div>
-                </div>
-            </div>`;
-        }).join('');
-
-        cont.innerHTML = `
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px">
-                <h2 style="margin:0; font-size:1.2rem">${obra.nombre}</h2>
-                <button onclick="exportarObra()" style="background:var(--primary); color:white; border:none; padding:8px 12px; border-radius:8px; font-size:0.7rem; cursor:pointer; font-weight:bold">📤 EXPORTAR</button>
+    <div class="container">
+        <div id="Contactos" class="tab-content" style="display: block;">
+            <div class="header-section">
+                <h2>Directorio de Contactos</h2>
+                <button class="btn-add">+ Añadir Contacto</button>
             </div>
-            <textarea placeholder="Notas, dirección, avisos..." onblur="actualizarNotas(this.value)">${obra.notas}</textarea>
-            <div style="background:#eef2ff; padding:12px; border-radius:10px; margin-bottom:20px; border: 1px solid #c7d2fe">
-                <p style="margin:0 0 8px 0; font-size:0.7rem; font-weight:bold; color:var(--primary)">AÑADIR NUEVA TAREA A LA OBRA:</p>
-                <div style="display:flex; gap:5px">
-                    <input type="text" id="inTarea" placeholder="Describa la tarea..." style="flex:1; padding:10px; border-radius:6px; border:1px solid #ddd">
-                    <button class="btn-add" onclick="agregarTarea()">AÑADIR</button>
-                </div>
+            <table id="tablaContactos">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Teléfono</th>
+                        <th>Email</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Juan Pérez</td>
+                        <td>+34 600 123 456</td>
+                        <td>juan@distribucionessl.com</td>
+                    </tr>
+                    <tr>
+                        <td>María López</td>
+                        <td>+34 600 654 321</td>
+                        <td>maria@mktdigital.es</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="Pagos" class="tab-content">
+            <div class="header-section">
+                <h2>Relación de Pagos (Gastos)</h2>
+                <button class="btn-add" style="background-color: #c0392b;">+ Registrar Pago</button>
             </div>
-            <div>${tareasHTML || '<p style="text-align:center; color:#ccc">No hay tareas en esta obra</p>'}</div>
-            <button style="margin-top:40px; color:var(--danger); background:none; border:none; width:100%; font-size:0.75rem; cursor:pointer; font-weight:bold" onclick="borrarObra(${obra.id})">✕ ELIMINAR OBRA COMPLETAMENTE</button>
-        `;
-    }
+            <table id="tablaPagos">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Concepto / Proveedor</th>
+                        <th>Importe</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>10/06/2026</td>
+                        <td>Factura Luz - Iberdrola</td>
+                        <td>150.00 €</td>
+                        <td class="status-paid">Pagado</td>
+                    </tr>
+                    <tr>
+                        <td>15/06/2026</td>
+                        <td>Suministros Oficina</td>
+                        <td>85.50 €</td>
+                        <td class="status-pending">Pendiente</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
-    // ACCIONES
-    function agregarTarea() {
-        const val = document.getElementById('inTarea').value.trim();
-        if(!val) return;
-        const responsableInicial = document.getElementById('filtroGlobal').value;
-        obras.find(o => o.id === idObraActual).tareas.push({ 
-            id: Date.now(), 
-            texto: val, 
-            hecha: false, 
-            materiales: [], 
-            responsable: (responsableInicial === "TODOS" ? "Sin asignar" : responsableInicial)
-        });
-        guardar(); renderDetalle();
-    }
+        <div id="Ingresos" class="tab-content">
+            <div class="header-section">
+                <h2>Relación de Ingresos</h2>
+                <button class="btn-add">+ Registrar Ingreso</button>
+            </div>
+            <table id="tablaIngresos">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Cliente / Concepto</th>
+                        <th>Importe</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>01/06/2026</td>
+                        <td>Distribuciones SL - Proyecto A</td>
+                        <td>1,200.00 €</td>
+                        <td class="status-paid">Cobrado</td>
+                    </tr>
+                    <tr>
+                        <td>12/06/2026</td>
+                        <td>Consultoría MKT Digital</td>
+                        <td>450.00 €</td>
+                        <td class="status-pending">Pendiente de Cobro</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-    function asignarOperario(idT, nombreOp) {
-        const o = obras.find(x => x.id === idObraActual);
-        o.tareas.find(t => t.id === idT).responsable = nombreOp;
-        guardar();
-    }
+    <script>
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
 
-    function agregarMaterial(idT) {
-        const input = document.getElementById(`inMat-${idT}`);
-        if(!input.value.trim()) return;
-        const t = obras.find(o => o.id === idObraActual).tareas.find(x => x.id === idT);
-        t.materiales.push({ id: Date.now(), texto: input.value.trim() });
-        input.value = ''; guardar(); renderDetalle();
-    }
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
 
-    function toggleTarea(idT) {
-        const t = obras.find(o => o.id === idObraActual).tareas.find(x => x.id === idT);
-        t.hecha = !t.hecha; guardar(); renderDetalle();
-    }
+            tablinks = document.getElementsByClassName("tab-links");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
 
-    function borrarTarea(idT) {
-        if(confirm("¿Borrar esta tarea y sus materiales?")) {
-            const o = obras.find(o => o.id === idObraActual);
-            o.tareas = o.tareas.filter(t => t.id !== idT);
-            guardar(); renderDetalle();
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
         }
-    }
 
-    function borrarMaterial(idT, idM) {
-        const t = obras.find(o => o.id === idObraActual).tareas.find(x => x.id === idT);
-        t.materiales = t.materiales.filter(m => m.id !== idM);
-        guardar(); renderDetalle();
-    }
+        function exportarTodoAExcel() {
+            var wb = XLSX.utils.book_new();
 
-    function exportarObra() {
-        const o = obras.find(x => x.id === idObraActual);
-        let texto = `⚡ *PARTE: ${o.nombre.toUpperCase()}*\n\n`;
-        o.tareas.forEach(t => {
-            texto += `${t.hecha ? '✅' : '⬜'} *${t.texto}*\n👤 ${t.responsable}\n`;
-            t.materiales.forEach(m => texto += `   └ 📦 ${m.texto}\n`);
-            texto += `\n`;
-        });
-        if (navigator.share) { navigator.share({ title: o.nombre, text: texto }); }
-        else { navigator.clipboard.writeText(texto); alert("Copiado al portapapeles."); }
-    }
+            var tablaCont = document.getElementById("tablaContactos");
+            var tablaPag = document.getElementById("tablaPagos");
+            var tablaIng = document.getElementById("tablaIngresos");
 
-    function actualizarNotas(v) { obras.find(o => o.id === idObraActual).notas = v; guardar(); }
-    function irADetalle(id) { idObraActual = id; document.querySelectorAll('.pantalla').forEach(p => p.classList.remove('activa')); document.getElementById('pantallaDetalle').classList.add('activa'); renderDetalle(); window.scrollTo(0,0); }
-    function irAListado() { idObraActual = null; document.querySelectorAll('.pantalla').forEach(p => p.classList.remove('activa')); document.getElementById('pantallaListado').classList.add('activa'); renderListado(); }
-    function borrarObra(id) { if(confirm("¿Seguro que quieres borrar la obra completa?")) { obras = obras.filter(o => o.id !== id); guardar(); irAListado(); } }
+            var hojaContactos = XLSX.utils.table_to_sheet(tablaCont);
+            var hojaPagos = XLSX.utils.table_to_sheet(tablaPag);
+            var hojaIngresos = XLSX.utils.table_to_sheet(tablaIng);
 
-    actualizarSelectFiltro();
-    renderListado();
-</script>
+            XLSX.utils.book_append_sheet(wb, hojaContactos, "Contactos");
+            XLSX.utils.book_append_sheet(wb, hojaPagos, "Pagos");
+            XLSX.utils.book_append_sheet(wb, hojaIngresos, "Ingresos");
+
+            XLSX.writeFile(wb, "Gestion_de_Empresa.xlsx");
+        }
+    </script>
+
 </body>
 </html>
