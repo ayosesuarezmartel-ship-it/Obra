@@ -33,7 +33,7 @@
         }
         .btn-export-excel:hover { background-color: #0c5e31; }
 
-        /* Menú vertical fijo */
+        /* Menú vertical/horizontal adaptables */
         .tab-menu { 
             display: flex;
             flex-direction: column; 
@@ -258,7 +258,7 @@
 
     <div id="modalIngreso" class="modal">
         <div class="modal-content">
-            <h3>Registrar Ingreso</h3>
+            <h3 id="modalIngresoTitle">Registrar Ingreso</h3>
             <div class="form-group"><label>Fecha:</label><input type="date" id="inputIngresoFecha"></div>
             <div class="form-group">
                 <label>Cliente:</label>
@@ -290,4 +290,353 @@
     </div>
 
     <script>
-        // --- BASE DE DATOS
+        // --- BASE DE DATOS EN MEMORIA ---
+        let clientes = [
+            { id: 1, nombre: "Juan Pérez", telefono: "+34 600 123 456" },
+            { id: 2, nombre: "María López", telefono: "+34 600 654 321" }
+        ];
+
+        let proveedores = [
+            { id: 1, nombre: "Suministros Ofi S.L.", telefono: "+34 912 345 678", correo: "ventas@suministrosofi.es" },
+            { id: 2, nombre: "Iberdrola", telefono: "+34 900 225 235", correo: "empresas@iberdrola.es" }
+        ];
+
+        let pagos = [
+            { id: 1, fecha: "2026-06-10", proveedor: "Iberdrola", concepto: "Factura Luz", forma: "Transferencia", importe: 150.00, estado: "Pagado" }
+        ];
+
+        let ingresos = [
+            { id: 1, fecha: "2026-06-01", cliente: "Juan Pérez", concepto: "Proyecto A", forma: "Bizum", importe: 1200.00, estado: "Cobrado" }
+        ];
+
+        let editId = null;
+
+        // --- SISTEMA DE PESTAÑAS BLINDADO ---
+        function openTab(botonElemento, tabName) {
+            var contenidos = document.getElementsByClassName("tab-content");
+            for (var i = 0; i < contenidos.length; i++) { contenidos[i].style.display = "none"; }
+            var botones = document.getElementsByClassName("tab-links");
+            for (var i = 0; i < botones.length; i++) { botones[i].classList.remove("active"); }
+            document.getElementById(tabName).style.display = "block";
+            botonElemento.classList.add("active");
+        }
+
+        function renderAll() {
+            renderClientes();
+            renderProveedores();
+            renderPagos();
+            renderIngresos();
+        }
+
+        function renderClientes() {
+            const tbody = document.querySelector("#tablaClientes tbody");
+            tbody.innerHTML = "";
+            clientes.forEach(c => {
+                tbody.insertAdjacentHTML('beforeend', `
+                    <tr>
+                        <td>${c.nombre}</td>
+                        <td>${c.telefono}</td>
+                        <td>
+                            <button class="btn-action btn-edit" onclick="abrirModalCliente(${c.id})">✏️</button>
+                            <button class="btn-action btn-delete" onclick="eliminarCliente(${c.id})">❌</button>
+                        </td>
+                    </tr>
+                `);
+            });
+            document.getElementById("badge-clientes").innerText = clientes.length;
+            document.getElementById("title-clientes").innerText = `(${clientes.length})`;
+        }
+
+        function renderProveedores() {
+            const tbody = document.querySelector("#tablaProveedores tbody");
+            tbody.innerHTML = "";
+            proveedores.forEach(p => {
+                tbody.insertAdjacentHTML('beforeend', `
+                    <tr>
+                        <td>${p.nombre}</td>
+                        <td>${p.telefono}</td>
+                        <td>${p.correo}</td>
+                        <td>
+                            <button class="btn-action btn-edit" onclick="abrirModalProveedor(${p.id})">✏️</button>
+                            <button class="btn-action btn-delete" onclick="eliminarProveedor(${p.id})">❌</button>
+                        </td>
+                    </tr>
+                `);
+            });
+            document.getElementById("badge-proveedores").innerText = proveedores.length;
+            document.getElementById("title-proveedores").innerText = `(${proveedores.length})`;
+        }
+
+        function renderPagos() {
+            const tbody = document.querySelector("#tablaPagos tbody");
+            tbody.innerHTML = "";
+            pagos.forEach(p => {
+                let claseEst = (p.estado === "Pagado") ? "status-paid" : "status-pending";
+                tbody.insertAdjacentHTML('beforeend', `
+                    <tr>
+                        <td>${p.fecha}</td>
+                        <td>${p.concepto} - ${p.proveedor}</td>
+                        <td>${p.forma}</td>
+                        <td>${parseFloat(p.importe).toFixed(2)} €</td>
+                        <td class="${claseEst}">${p.estado}</td>
+                        <td>
+                            <button class="btn-action btn-edit" onclick="abrirModalPago(${p.id})">✏️</button>
+                            <button class="btn-action btn-delete" onclick="eliminarPago(${p.id})">❌</button>
+                        </td>
+                    </tr>
+                `);
+            });
+            document.getElementById("badge-pagos").innerText = pagos.length;
+            document.getElementById("title-pagos").innerText = `(${pagos.length})`;
+        }
+
+        function renderIngresos() {
+            const tbody = document.querySelector("#tablaIngresos tbody");
+            tbody.innerHTML = "";
+            ingresos.forEach(i => {
+                let claseEst = (i.estado === "Cobrado") ? "status-paid" : "status-pending";
+                tbody.insertAdjacentHTML('beforeend', `
+                    <tr>
+                        <td>${i.fecha}</td>
+                        <td>${i.cliente} - ${i.concepto}</td>
+                        <td>${i.forma}</td>
+                        <td>${parseFloat(i.importe).toFixed(2)} €</td>
+                        <td class="${claseEst}">${i.estado}</td>
+                        <td>
+                            <button class="btn-action btn-edit" onclick="abrirModalIngreso(${i.id})">✏️</button>
+                            <button class="btn-action btn-delete" onclick="eliminarIngreso(${i.id})">❌</button>
+                        </td>
+                    </tr>
+                `);
+            });
+            document.getElementById("badge-ingresos").innerText = ingresos.length;
+            document.getElementById("title-ingresos").innerText = `(${ingresos.length})`;
+        }
+
+        function cargarOpcionesSelect(origenDatos, idSelect) {
+            var select = document.getElementById(idSelect);
+            select.innerHTML = "";
+            
+            var optDefault = document.createElement("option");
+            optDefault.value = "General";
+            optDefault.text = "General / Varios";
+            select.appendChild(optDefault);
+
+            origenDatos.forEach(function(item) {
+                var opcion = document.createElement("option");
+                opcion.value = item.nombre;
+                opcion.text = item.nombre;
+                select.appendChild(opcion);
+            });
+        }
+
+        function cerrarModal(id) { document.getElementById(id).style.display = "none"; editId = null; }
+
+        function abrirModalCliente(id) {
+            if(id && typeof id === 'number') {
+                editId = id;
+                let c = clientes.find(x => x.id === id);
+                document.getElementById('inputCliNombre').value = c.nombre;
+                document.getElementById('inputCliTel').value = c.telefono;
+                document.getElementById('modalClienteTitle').innerText = "Modificar Cliente";
+                document.getElementById('btnGuardarCliente').innerText = "Actualizar";
+            } else {
+                editId = null;
+                document.getElementById('inputCliNombre').value = "";
+                document.getElementById('inputCliTel').value = "";
+                document.getElementById('modalClienteTitle').innerText = "Nuevo Cliente";
+                document.getElementById('btnGuardarCliente').innerText = "Guardar";
+            }
+            document.getElementById('modalCliente').style.display = "block";
+        }
+
+        function guardarCliente() {
+            var nom = document.getElementById('inputCliNombre').value;
+            var tel = document.getElementById('inputCliTel').value;
+            if (!nom || !tel) return alert("Rellena todos los campos");
+            
+            if(editId) {
+                let c = clientes.find(x => x.id === editId);
+                c.nombre = nom; c.telefono = tel;
+            } else {
+                // CORRECCIÓN: 'telefono' en vez de 'telephone'
+                clientes.push({ id: Date.now(), nombre: nom, telefono: tel });
+            }
+            cerrarModal('modalCliente');
+            renderClientes();
+        }
+
+        function eliminarCliente(id) {
+            if(confirm("¿Estás seguro de eliminar este cliente?")) {
+                clientes = clientes.filter(x => x.id !== id);
+                renderClientes();
+            }
+        }
+
+        function abrirModalProveedor(id) {
+            if(id && typeof id === 'number') {
+                editId = id;
+                let p = proveedores.find(x => x.id === id);
+                document.getElementById('inputProvNombre').value = p.nombre;
+                document.getElementById('inputProvTel').value = p.telefono;
+                document.getElementById('inputProvEmail').value = p.correo;
+                document.getElementById('modalProveedorTitle').innerText = "Modificar Proveedor";
+                document.getElementById('btnGuardarProveedor').innerText = "Actualizar";
+            } else {
+                editId = null;
+                document.getElementById('inputProvNombre').value = "";
+                document.getElementById('inputProvTel').value = "";
+                document.getElementById('inputProvEmail').value = "";
+                document.getElementById('modalProveedorTitle').innerText = "Nuevo Proveedor";
+                document.getElementById('btnGuardarProveedor').innerText = "Guardar";
+            }
+            document.getElementById('modalProveedor').style.display = "block";
+        }
+
+        function guardarProveedor() {
+            var nom = document.getElementById('inputProvNombre').value;
+            var tel = document.getElementById('inputProvTel').value;
+            var email = document.getElementById('inputProvEmail').value;
+            if (!nom || !tel || !email) return alert("Rellena todos los campos");
+            
+            if(editId) {
+                let p = proveedores.find(x => x.id === editId);
+                p.nombre = nom; p.telefono = tel; p.correo = email;
+            } else {
+                proveedores.push({ id: Date.now(), nombre: nom, telefono: tel, correo: email });
+            }
+            cerrarModal('modalProveedor');
+            renderProveedores();
+        }
+
+        function eliminarProveedor(id) {
+            if(confirm("¿Estás seguro de eliminar este proveedor?")) {
+                proveedores = proveedores.filter(x => x.id !== id);
+                renderProveedores();
+            }
+        }
+
+        function abrirModalPago(id) {
+            cargarOpcionesSelect(proveedores, "selectPagoProveedor");
+            if(id && typeof id === 'number') {
+                editId = id;
+                let p = pagos.find(x => x.id === id);
+                document.getElementById('inputPagoFecha').value = p.fecha;
+                document.getElementById('selectPagoProveedor').value = p.proveedor;
+                document.getElementById('inputPagoConcepto').value = p.concepto;
+                document.getElementById('selectPagoForma').value = p.forma;
+                document.getElementById('inputPagoImporte').value = p.importe;
+                document.getElementById('selectPagoEstado').value = p.estado;
+                document.getElementById('modalPagoTitle').innerText = "Modificar Pago";
+                document.getElementById('btnGuardarPago').innerText = "Actualizar";
+            } else {
+                editId = null;
+                document.getElementById('inputPagoFecha').valueAsDate = new Date();
+                document.getElementById('inputPagoConcepto').value = "";
+                document.getElementById('inputPagoImporte').value = "";
+                document.getElementById('modalPagoTitle').innerText = "Registrar Pago";
+                document.getElementById('btnGuardarPago').innerText = "Guardar";
+            }
+            document.getElementById('modalPago').style.display = "block";
+        }
+
+        function guardarPago() {
+            var fecha = document.getElementById('inputPagoFecha').value;
+            var prov = document.getElementById('selectPagoProveedor').value || "General";
+            var conc = document.getElementById('inputPagoConcepto').value;
+            var forma = document.getElementById('selectPagoForma').value;
+            var imp = document.getElementById('inputPagoImporte').value;
+            var est = document.getElementById('selectPagoEstado').value;
+
+            if (!fecha || !conc || !imp) return alert("Rellena todos los campos");
+
+            if(editId) {
+                let p = pagos.find(x => x.id === editId);
+                p.fecha = fecha; p.proveedor = prov; p.concepto = conc; p.forma = forma; p.importe = imp; p.estado = est;
+            } else {
+                pagos.push({ id: Date.now(), fecha: fecha, proveedor: prov, concepto: conc, forma: forma, importe: imp, estado: est });
+            }
+            cerrarModal('modalPago');
+            renderPagos();
+        }
+
+        function eliminarPago(id) {
+            if(confirm("¿Estás seguro de eliminar este pago?")) {
+                pagos = pagos.filter(x => x.id !== id);
+                renderPagos();
+            }
+        }
+
+        function abrirModalIngreso(id) {
+            cargarOpcionesSelect(clientes, "selectIngresoCliente");
+            if(id && typeof id === 'number') {
+                editId = id;
+                let i = ingresos.find(x => x.id === id);
+                document.getElementById('inputIngresoFecha').value = i.fecha;
+                document.getElementById('selectIngresoCliente').value = i.cliente;
+                document.getElementById('inputIngresoConcepto').value = i.concepto;
+                document.getElementById('selectIngresoForma').value = i.forma;
+                document.getElementById('inputIngresoImporte').value = i.importe;
+                document.getElementById('selectIngresoEstado').value = i.estado;
+                document.getElementById('modalIngresoTitle').innerText = "Modificar Ingreso";
+                document.getElementById('btnGuardarIngreso').innerText = "Actualizar";
+            } else {
+                editId = null;
+                document.getElementById('inputIngresoFecha').valueAsDate = new Date();
+                document.getElementById('inputIngresoConcepto').value = "";
+                document.getElementById('inputIngresoImporte').value = "";
+                document.getElementById('modalIngresoTitle').innerText = "Registrar Ingreso";
+                document.getElementById('btnGuardarIngreso').innerText = "Guardar";
+            }
+            document.getElementById('modalIngreso').style.display = "block";
+        }
+
+        function guardarIngreso() {
+            var fecha = document.getElementById('inputIngresoFecha').value;
+            var cli = document.getElementById('selectIngresoCliente').value || "General";
+            var conc = document.getElementById('inputIngresoConcepto').value;
+            var forma = document.getElementById('selectIngresoForma').value;
+            var imp = document.getElementById('inputIngresoImporte').value;
+            var est = document.getElementById('selectIngresoEstado').value;
+
+            if (!fecha || !conc || !imp) return alert("Rellena todos los campos");
+
+            if(editId) {
+                let i = ingresos.find(x => x.id === editId);
+                i.fecha = fecha; i.cliente = cli; i.concepto = conc; i.forma = forma; i.importe = imp; i.estado = est;
+            } else {
+                ingresos.push({ id: Date.now(), fecha: fecha, cliente: cli, concepto: conc, forma: forma, importe: imp, estado: est });
+            }
+            cerrarModal('modalIngreso');
+            renderIngresos();
+        }
+
+        function eliminarIngreso(id) {
+            if(confirm("¿Estás seguro de eliminar este ingreso?")) {
+                ingresos = ingresos.filter(x => x.id !== id);
+                renderIngresos();
+            }
+        }
+
+        function exportarTodoAExcel() {
+            var wb = XLSX.utils.book_new();
+            
+            var dataCli = clientes.map(c => ({ "Nombre": c.nombre, "Teléfono": c.telefono }));
+            var dataProv = proveedores.map(p => ({ "Nombre / Empresa": p.nombre, "Teléfono": p.telefono, "Correo": p.correo }));
+            var dataPag = pagos.map(p => ({ "Fecha": p.fecha, "Concepto / Proveedor": `${p.concepto} - ${p.proveedor}`, "Forma de Pago": p.forma, "Importe (€)": parseFloat(p.importe), "Estado": p.estado }));
+            var dataIng = ingresos.map(i => ({ "Fecha": i.fecha, "Cliente / Concepto": `${i.cliente} - ${i.concepto}`, "Forma de Pago": i.forma, "Importe (€)": parseFloat(i.importe), "Estado": i.estado }));
+
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dataCli), "Clientes");
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dataProv), "Proveedores");
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dataPag), "Pagos");
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dataIng), "Ingresos");
+            
+            XLSX.writeFile(wb, "Gestion_de_Empresa.xlsx");
+        }
+
+        window.onload = function() {
+            renderAll();
+        };
+    </script>
+</body>
+</html>
