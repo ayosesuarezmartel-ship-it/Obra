@@ -71,7 +71,6 @@
         
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
-        /* Añadido "select" para que los desplegables se vean igual que los textos */
         .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit;}
 
         .modal-buttons { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
@@ -176,3 +175,207 @@
             <div class="form-group"><label>Teléfono:</label><input type="text" id="inputProvTel"></div>
             <div class="form-group"><label>Correo:</label><input type="email" id="inputProvEmail"></div>
             <div class="modal-buttons">
+                <button class="btn-cancel" onclick="cerrarModal('modalProveedor')">Cancelar</button>
+                <button class="btn-add" style="background-color: #8e44ad;" onclick="guardarProveedor()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalPago" class="modal">
+        <div class="modal-content">
+            <h3 style="color: #c0392b;">Registrar Pago</h3>
+            <div class="form-group"><label>Fecha:</label><input type="date" id="inputPagoFecha"></div>
+            <div class="form-group">
+                <label>Proveedor:</label>
+                <select id="selectPagoProveedor"></select>
+            </div>
+            <div class="form-group"><label>Concepto (Ej. Factura luz):</label><input type="text" id="inputPagoConcepto"></div>
+            <div class="form-group"><label>Importe (€):</label><input type="number" step="0.01" id="inputPagoImporte"></div>
+            <div class="form-group">
+                <label>Estado:</label>
+                <select id="selectPagoEstado">
+                    <option value="Pagado">Pagado</option>
+                    <option value="Pendiente">Pendiente</option>
+                </select>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="cerrarModal('modalPago')">Cancelar</button>
+                <button class="btn-add" style="background-color: #c0392b;" onclick="guardarPago()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalIngreso" class="modal">
+        <div class="modal-content">
+            <h3>Registrar Ingreso</h3>
+            <div class="form-group"><label>Fecha:</label><input type="date" id="inputIngresoFecha"></div>
+            <div class="form-group">
+                <label>Cliente (Contacto):</label>
+                <select id="selectIngresoCliente"></select>
+            </div>
+            <div class="form-group"><label>Concepto (Ej. Consultoría):</label><input type="text" id="inputIngresoConcepto"></div>
+            <div class="form-group"><label>Importe (€):</label><input type="number" step="0.01" id="inputIngresoImporte"></div>
+            <div class="form-group">
+                <label>Estado:</label>
+                <select id="selectIngresoEstado">
+                    <option value="Cobrado">Cobrado</option>
+                    <option value="Pendiente de Cobro">Pendiente de Cobro</option>
+                </select>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="cerrarModal('modalIngreso')">Cancelar</button>
+                <button class="btn-add" onclick="guardarIngreso()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- NUEVA FUNCIÓN CORREGIDA Y CORRECCIÓN DE NAVEGACIÓN ---
+        function openTab(evt, tabName) {
+            // 1. Ocultar todos los bloques de contenido
+            var contenidos = document.getElementsByClassName("tab-content");
+            for (var i = 0; i < contenidos.length; i++) {
+                contenidos[i].style.display = "none";
+            }
+
+            // 2. Quitar la propiedad "active" de todos los botones de forma segura
+            var botones = document.getElementsByClassName("tab-links");
+            for (var i = 0; i < botones.length; i++) {
+                botones[i].classList.remove("active");
+            }
+
+            // 3. Mostrar el bloque de la pestaña seleccionada
+            document.getElementById(tabName).style.display = "block";
+
+            // 4. Marcar el botón actual como activo usando classList (evita errores de texto)
+            evt.currentTarget.classList.add("active");
+        }
+
+        // --- EXPORTAR A EXCEL ---
+        function exportarTodoAExcel() {
+            var wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.table_to_sheet(document.getElementById("tablaContactos")), "Contactos");
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.table_to_sheet(document.getElementById("tablaProveedores")), "Proveedores");
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.table_to_sheet(document.getElementById("tablaPagos")), "Pagos");
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.table_to_sheet(document.getElementById("tablaIngresos")), "Ingresos");
+            XLSX.writeFile(wb, "Gestion_de_Empresa.xlsx");
+        }
+
+        // --- MODALES ---
+        function cerrarModal(id) {
+            document.getElementById(id).style.display = "none";
+        }
+
+        function cargarOpcionesSelect(idTabla, idSelect) {
+            var select = document.getElementById(idSelect);
+            select.innerHTML = "";
+            var filas = document.querySelectorAll("#" + idTabla + " tbody tr");
+            
+            if(filas.length === 0) {
+                var opcion = document.createElement("option");
+                opcion.value = "";
+                opcion.text = "No hay registros disponibles...";
+                select.appendChild(opcion);
+                return;
+            }
+
+            filas.forEach(function(fila) {
+                var nombre = fila.cells[0].innerText;
+                var opcion = document.createElement("option");
+                opcion.value = nombre;
+                opcion.text = nombre;
+                select.appendChild(opcion);
+            });
+        }
+
+        // --- CONTACTOS ---
+        function abrirModalContacto() {
+            document.getElementById('inputContNombre').value = "";
+            document.getElementById('inputContTel').value = "";
+            document.getElementById('modalContacto').style.display = "block";
+        }
+
+        function guardarContacto() {
+            var nom = document.getElementById('inputContNombre').value;
+            var tel = document.getElementById('inputContTel').value;
+            if (!nom || !tel) return alert("Rellena todos los campos");
+            
+            var tbody = document.querySelector("#tablaContactos tbody");
+            tbody.insertAdjacentHTML('beforeend', `<tr><td>${nom}</td><td>${tel}</td></tr>`);
+            cerrarModal('modalContacto');
+        }
+
+        // --- PROVEEDORES ---
+        function abrirModalProveedor() {
+            document.getElementById('inputProvNombre').value = "";
+            document.getElementById('inputProvTel').value = "";
+            document.getElementById('inputProvEmail').value = "";
+            document.getElementById('modalProveedor').style.display = "block";
+        }
+
+        function guardarProveedor() {
+            var nom = document.getElementById('inputProvNombre').value;
+            var tel = document.getElementById('inputProvTel').value;
+            var email = document.getElementById('inputProvEmail').value;
+            if (!nom || !tel || !email) return alert("Rellena todos los campos");
+            
+            var tbody = document.querySelector("#tablaProveedores tbody");
+            tbody.insertAdjacentHTML('beforeend', `<tr><td>${nom}</td><td>${tel}</td><td>${email}</td></tr>`);
+            cerrarModal('modalProveedor');
+        }
+
+        // --- PAGOS (GASTOS) ---
+        function abrirModalPago() {
+            document.getElementById('inputPagoFecha').valueAsDate = new Date();
+            document.getElementById('inputPagoConcepto').value = "";
+            document.getElementById('inputPagoImporte').value = "";
+            cargarOpcionesSelect("tablaProveedores", "selectPagoProveedor");
+            document.getElementById('modalPago').style.display = "block";
+        }
+
+        function guardarPago() {
+            var fecha = document.getElementById('inputPagoFecha').value;
+            var prov = document.getElementById('selectPagoProveedor').value;
+            var conc = document.getElementById('inputPagoConcepto').value;
+            var imp = document.getElementById('inputPagoImporte').value;
+            var est = document.getElementById('selectPagoEstado').value;
+
+            if (!fecha || !prov || !conc || !imp) return alert("Rellena todos los campos");
+
+            var claseEstado = (est === "Pagado") ? "status-paid" : "status-pending";
+            var textoConcepto = conc + " - " + prov;
+
+            var tbody = document.querySelector("#tablaPagos tbody");
+            tbody.insertAdjacentHTML('beforeend', `<tr><td>${fecha}</td><td>${textoConcepto}</td><td>${parseFloat(imp).toFixed(2)} €</td><td class="${claseEstado}">${est}</td></tr>`);
+            cerrarModal('modalPago');
+        }
+
+        // --- INGRESOS ---
+        function abrirModalIngreso() {
+            document.getElementById('inputIngresoFecha').valueAsDate = new Date();
+            document.getElementById('inputIngresoConcepto').value = "";
+            document.getElementById('inputIngresoImporte').value = "";
+            cargarOpcionesSelect("tablaContactos", "selectIngresoCliente");
+            document.getElementById('modalIngreso').style.display = "block";
+        }
+
+        function guardarIngreso() {
+            var fecha = document.getElementById('inputIngresoFecha').value;
+            var cli = document.getElementById('selectIngresoCliente').value;
+            var conc = document.getElementById('inputIngresoConcepto').value;
+            var imp = document.getElementById('inputIngresoImporte').value;
+            var est = document.getElementById('selectIngresoEstado').value;
+
+            if (!fecha || !cli || !conc || !imp) return alert("Rellena todos los campos");
+
+            var claseEstado = (est === "Cobrado") ? "status-paid" : "status-pending";
+            var textoConcepto = cli + " - " + conc;
+
+            var tbody = document.querySelector("#tablaIngresos tbody");
+            tbody.insertAdjacentHTML('beforeend', `<tr><td>${fecha}</td><td>${textoConcepto}</td><td>${parseFloat(imp).toFixed(2)} €</td><td class="${claseEstado}">${est}</td></tr>`);
+            cerrarModal('modalIngreso');
+        }
+    </script>
+
+</body>
+</html>
