@@ -63,7 +63,6 @@
             padding-left: 25px; 
         }
 
-        /* Estilo para los contadores (Badges) en el menú */
         .tab-badge {
             background-color: rgba(255, 255, 255, 0.2);
             padding: 2px 8px;
@@ -89,7 +88,6 @@
         table th { background-color: var(--primary-color); color: white; }
         table tr:hover { background-color: #f1f1f1; }
 
-        /* Botones de acción en filas */
         .btn-action {
             border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer; 
             font-size: 12px; margin-right: 4px; transition: 0.2s; color: white;
@@ -132,16 +130,16 @@
     </header>
 
     <div class="tab-menu">
-        <button class="tab-links active" onclick="openTab(event, 'Clientes')">
+        <button class="tab-links active" onclick="openTab(this, 'Clientes')">
             Lista de clientes <span class="tab-badge" id="badge-clientes">0</span>
         </button>
-        <button class="tab-links" onclick="openTab(event, 'Proveedores')">
+        <button class="tab-links" onclick="openTab(this, 'Proveedores')">
             Lista de proveedores <span class="tab-badge" id="badge-proveedores">0</span>
         </button>
-        <button class="tab-links" onclick="openTab(event, 'Pagos')">
+        <button class="tab-links" onclick="openTab(this, 'Pagos')">
             Relación de pagos <span class="tab-badge" id="badge-pagos">0</span>
         </button>
-        <button class="tab-links" onclick="openTab(event, 'Ingresos')">
+        <button class="tab-links" onclick="openTab(this, 'Ingresos')">
             Relación de ingresos <span class="tab-badge" id="badge-ingresos">0</span>
         </button>
     </div>
@@ -260,7 +258,7 @@
 
     <div id="modalIngreso" class="modal">
         <div class="modal-content">
-            <h3 id="modalIngresoTitle">Registrar Ingreso</h3>
+            <h3>Registrar Ingreso</h3>
             <div class="form-group"><label>Fecha:</label><input type="date" id="inputIngresoFecha"></div>
             <div class="form-group">
                 <label>Cliente:</label>
@@ -292,191 +290,4 @@
     </div>
 
     <script>
-        // --- BASE DE DATOS EN MEMORIA (ESTADO CENTRALIZADO) ---
-        let clientes = [
-            { id: 1, nombre: "Juan Pérez", telefono: "+34 600 123 456" },
-            { id: 2, nombre: "María López", telefono: "+34 600 654 321" }
-        ];
-
-        let proveedores = [
-            { id: 1, nombre: "Suministros Ofi S.L.", telefono: "+34 912 345 678", correo: "ventas@suministrosofi.es" },
-            { id: 2, nombre: "Iberdrola", telefono: "+34 900 225 235", correo: "empresas@iberdrola.es" }
-        ];
-
-        let pagos = [
-            { id: 1, fecha: "2026-06-10", proveedor: "Iberdrola", concepto: "Factura Luz", forma: "Transferencia", importe: 150.00, estado: "Pagado" }
-        ];
-
-        let ingresos = [
-            { id: 1, fecha: "2026-06-01", cliente: "Juan Pérez", concepto: "Proyecto A", forma: "Bizum", importe: 1200.00, estado: "Cobrado" }
-        ];
-
-        // Variable global para controlar qué ID estamos editando (null = creando nuevo)
-        let editId = null;
-
-        // --- NAVEGACIÓN DE PESTAÑAS ---
-        function openTab(evt, tabName) {
-            var contenidos = document.getElementsByClassName("tab-content");
-            for (var i = 0; i < contenidos.length; i++) { contenidos[i].style.display = "none"; }
-            var botones = document.getElementsByClassName("tab-links");
-            for (var i = 0; i < botones.length; i++) { botones[i].classList.remove("active"); }
-            document.getElementById(tabName).style.display = "block";
-            evt.currentTarget.classList.add("active");
-        }
-
-        // --- FUNCIONES DE RENDERIZADO Y ACTUALIZACIÓN DE CONTADORES ---
-        function renderAll() {
-            renderClientes();
-            renderProveedores();
-            renderPagos();
-            renderIngresos();
-        }
-
-        function renderClientes() {
-            const tbody = document.querySelector("#tablaClientes tbody");
-            tbody.innerHTML = "";
-            clientes.forEach(c => {
-                tbody.insertAdjacentHTML('beforeend', `
-                    <tr>
-                        <td>${c.nombre}</td>
-                        <td>${c.telefono}</td>
-                        <td>
-                            <button class="btn-action btn-edit" onclick="abrirModalCliente(${c.id})">✏️ Editar</button>
-                            <button class="btn-action btn-delete" onclick="eliminarCliente(${c.id})">❌ Borrar</button>
-                        </td>
-                    </tr>
-                `);
-            });
-            document.getElementById("badge-clientes").innerText = clientes.length;
-            document.getElementById("title-clientes").innerText = `(${clientes.length})`;
-        }
-
-        function renderProveedores() {
-            const tbody = document.querySelector("#tablaProveedores tbody");
-            tbody.innerHTML = "";
-            proveedores.forEach(p => {
-                tbody.insertAdjacentHTML('beforeend', `
-                    <tr>
-                        <td>${p.nombre}</td>
-                        <td>${p.telefono}</td>
-                        <td>${p.correo}</td>
-                        <td>
-                            <button class="btn-action btn-edit" onclick="abrirModalProveedor(${p.id})">✏️ Editar</button>
-                            <button class="btn-action btn-delete" onclick="eliminarProveedor(${p.id})">❌ Borrar</button>
-                        </td>
-                    </tr>
-                `);
-            });
-            document.getElementById("badge-proveedores").innerText = proveedores.length;
-            document.getElementById("title-proveedores").innerText = `(${proveedores.length})`;
-        }
-
-        function renderPagos() {
-            const tbody = document.querySelector("#tablaPagos tbody");
-            tbody.innerHTML = "";
-            pagos.forEach(p => {
-                let claseEst = (p.estado === "Pagado") ? "status-paid" : "status-pending";
-                tbody.insertAdjacentHTML('beforeend', `
-                    <tr>
-                        <td>${p.fecha}</td>
-                        <td>${p.concepto} - ${p.proveedor}</td>
-                        <td>${p.forma}</td>
-                        <td>${parseFloat(p.importe).toFixed(2)} €</td>
-                        <td class="${claseEst}">${p.estado}</td>
-                        <td>
-                            <button class="btn-action btn-edit" onclick="abrirModalPago(${p.id})">✏️ Editar</button>
-                            <button class="btn-action btn-delete" onclick="eliminarPago(${p.id})">❌ Borrar</button>
-                        </td>
-                    </tr>
-                `);
-            });
-            document.getElementById("badge-pagos").innerText = pagos.length;
-            document.getElementById("title-pagos").innerText = `(${pagos.length})`;
-        }
-
-        function renderIngresos() {
-            const tbody = document.querySelector("#tablaIngresos tbody");
-            tbody.innerHTML = "";
-            ingresos.forEach(i => {
-                let claseEst = (i.estado === "Cobrado") ? "status-paid" : "status-pending";
-                tbody.insertAdjacentHTML('beforeend', `
-                    <tr>
-                        <td>${i.fecha}</td>
-                        <td>${i.cliente} - ${i.concepto}</td>
-                        <td>${i.forma}</td>
-                        <td>${parseFloat(i.importe).toFixed(2)} €</td>
-                        <td class="${claseEst}">${i.estado}</td>
-                        <td>
-                            <button class="btn-action btn-edit" onclick="abrirModalIngreso(${i.id})">✏️ Editar</button>
-                            <button class="btn-action btn-delete" onclick="eliminarIngreso(${i.id})">❌ Borrar</button>
-                        </td>
-                    </tr>
-                `);
-            });
-            document.getElementById("badge-ingresos").innerText = ingresos.length;
-            document.getElementById("title-ingresos").innerText = `(${ingresos.length})`;
-        }
-
-        // --- CARGAR SELECTS DESDE EL ESTADO ---
-        function cargarOpcionesSelect(origenDatos, idSelect) {
-            var select = document.getElementById(idSelect);
-            select.innerHTML = "";
-            if(origenDatos.length === 0) {
-                var opcion = document.createElement("option");
-                opcion.value = "";
-                opcion.text = "No hay registros disponibles...";
-                select.appendChild(opcion);
-                return;
-            }
-            origenDatos.forEach(function(item) {
-                var opcion = document.createElement("option");
-                opcion.value = item.nombre;
-                opcion.text = item.nombre;
-                select.appendChild(opcion);
-            });
-        }
-
-        // --- MODALES GENERALES ---
-        function cerrarModal(id) { document.getElementById(id).style.display = "none"; editId = null; }
-
-        // --- LÓGICA: CLIENTES (AÑADIR / MODIFICAR / ELIMINAR) ---
-        function abrirModalCliente(id = null) {
-            editId = id;
-            if(id) {
-                let c = clientes.find(x => x.id === id);
-                document.getElementById('inputCliNombre').value = c.nombre;
-                document.getElementById('inputCliTel').value = c.telefono;
-                document.getElementById('modalClienteTitle').innerText = "Modificar Cliente";
-                document.getElementById('btnGuardarCliente').innerText = "Actualizar";
-            } else {
-                document.getElementById('inputCliNombre').value = "";
-                document.getElementById('inputCliTel').value = "";
-                document.getElementById('modalClienteTitle').innerText = "Nuevo Cliente";
-                document.getElementById('btnGuardarCliente').innerText = "Guardar";
-            }
-            document.getElementById('modalCliente').style.display = "block";
-        }
-
-        function guardarCliente() {
-            var nom = document.getElementById('inputCliNombre').value;
-            var tel = document.getElementById('inputCliTel').value;
-            if (!nom || !tel) return alert("Rellena todos los campos");
-            
-            if(editId) {
-                let c = clientes.find(x => x.id === editId);
-                c.nombre = nom; c.telefono = tel;
-            } else {
-                clientes.push({ id: Date.now(), nombre: nom, telefono: tel });
-            }
-            cerrarModal('modalCliente');
-            renderClientes();
-        }
-
-        function eliminarCliente(id) {
-            if(confirm("¿Estás seguro de eliminar este cliente?")) {
-                clientes = clientes.filter(x => x.id !== id);
-                renderClientes();
-            }
-        }
-
-        // ---
+        // --- BASE DE DATOS
