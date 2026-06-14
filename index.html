@@ -83,10 +83,44 @@
         .tab-content { display: none; animation: fadeIn 0.5s; }
         @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        /* NUEVO: Contenedor con altura fija y scroll interno para proteger la estructura */
+        .table-container {
+            max-height: 420px; 
+            overflow-y: auto;  
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-top: 10px;
+            position: relative;
+        }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 0; }
         table th, table td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-        table th { background-color: var(--primary-color); color: white; }
+        
+        /* NUEVO: Cabecera fija (Sticky) para no perder de vista las columnas al bajar */
+        table th { 
+            background-color: var(--primary-color); 
+            color: white; 
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: 0 2px 2px rgba(0,0,0,0.1);
+        }
         table tr:hover { background-color: #f1f1f1; }
+
+        /* NUEVO: Estilos para las barras de búsqueda */
+        .search-container {
+            margin-bottom: 15px;
+            width: 100%;
+        }
+        .search-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: 14px;
+        }
 
         .btn-action {
             border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer; 
@@ -150,12 +184,17 @@
                 <h2>Directorio de Clientes <span id="title-clientes"></span></h2>
                 <button class="btn-add" onclick="abrirModalCliente()">+ Añadir Cliente</button>
             </div>
-            <table id="tablaClientes">
-                <thead>
-                    <tr><th>Nombre</th><th>Teléfono</th><th>Acciones</th></tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+            <div class="search-container">
+                <input type="text" id="searchClientes" class="search-input" placeholder="🔍 Buscar cliente por nombre o teléfono..." oninput="renderClientes()">
+            </div>
+            <div class="table-container">
+                <table id="tablaClientes">
+                    <thead>
+                        <tr><th>Nombre</th><th>Teléfono</th><th>Acciones</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
 
         <div id="Proveedores" class="tab-content">
@@ -163,12 +202,17 @@
                 <h2>Lista de Proveedores <span id="title-proveedores"></span></h2>
                 <button class="btn-add" style="background-color: #8e44ad;" onclick="abrirModalProveedor()">+ Añadir Proveedor</button>
             </div>
-            <table id="tablaProveedores">
-                <thead>
-                    <tr><th>Nombre / Empresa</th><th>Teléfono</th><th>Correo</th><th>Acciones</th></tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+            <div class="search-container">
+                <input type="text" id="searchProveedores" class="search-input" placeholder="🔍 Buscar proveedor por nombre, teléfono o correo..." oninput="renderProveedores()">
+            </div>
+            <div class="table-container">
+                <table id="tablaProveedores">
+                    <thead>
+                        <tr><th>Nombre / Empresa</th><th>Teléfono</th><th>Correo</th><th>Acciones</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
 
         <div id="Pagos" class="tab-content">
@@ -176,12 +220,17 @@
                 <h2>Relación de Pagos (Gastos) <span id="title-pagos"></span></h2>
                 <button class="btn-add" style="background-color: #c0392b;" onclick="abrirModalPago()">+ Registrar Pago</button>
             </div>
-            <table id="tablaPagos">
-                <thead>
-                    <tr><th>Fecha</th><th>Concepto / Proveedor</th><th>Forma de Pago</th><th>Importe</th><th>Estado</th><th>Acciones</th></tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+            <div class="search-container">
+                <input type="text" id="searchPagos" class="search-input" placeholder="🔍 Buscar pago por concepto, proveedor, forma de pago o estado..." oninput="renderPagos()">
+            </div>
+            <div class="table-container">
+                <table id="tablaPagos">
+                    <thead>
+                        <tr><th>Fecha</th><th>Concepto / Proveedor</th><th>Forma de Pago</th><th>Importe</th><th>Estado</th><th>Acciones</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
 
         <div id="Ingresos" class="tab-content">
@@ -189,12 +238,17 @@
                 <h2>Relación de Ingresos <span id="title-ingresos"></span></h2>
                 <button class="btn-add" onclick="abrirModalIngreso()">+ Registrar Ingreso</button>
             </div>
-            <table id="tablaIngresos">
-                <thead>
-                    <tr><th>Fecha</th><th>Cliente / Concepto</th><th>Forma de Pago</th><th>Importe</th><th>Estado</th><th>Acciones</th></tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+            <div class="search-container">
+                <input type="text" id="searchIngresos" class="search-input" placeholder="🔍 Buscar ingreso por concepto, cliente, forma de pago o estado..." oninput="renderIngresos()">
+            </div>
+            <div class="table-container">
+                <table id="tablaIngresos">
+                    <thead>
+                        <tr><th>Fecha</th><th>Cliente / Concepto</th><th>Forma de Pago</th><th>Importe</th><th>Estado</th><th>Acciones</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -328,10 +382,18 @@
             renderIngresos();
         }
 
+        // --- RENDERS MODIFICADOS CON FILTRADO EN TIEMPO REAL ---
         function renderClientes() {
+            const query = document.getElementById("searchClientes") ? document.getElementById("searchClientes").value.toLowerCase() : "";
             const tbody = document.querySelector("#tablaClientes tbody");
             tbody.innerHTML = "";
-            clientes.forEach(c => {
+            
+            const filtrados = clientes.filter(c => 
+                c.nombre.toLowerCase().includes(query) || 
+                c.telefono.toLowerCase().includes(query)
+            );
+
+            filtrados.forEach(c => {
                 tbody.insertAdjacentHTML('beforeend', `
                     <tr>
                         <td>${c.nombre}</td>
@@ -348,9 +410,17 @@
         }
 
         function renderProveedores() {
+            const query = document.getElementById("searchProveedores") ? document.getElementById("searchProveedores").value.toLowerCase() : "";
             const tbody = document.querySelector("#tablaProveedores tbody");
             tbody.innerHTML = "";
-            proveedores.forEach(p => {
+
+            const filtrados = proveedores.filter(p => 
+                p.nombre.toLowerCase().includes(query) || 
+                p.telefono.toLowerCase().includes(query) ||
+                p.correo.toLowerCase().includes(query)
+            );
+
+            filtrados.forEach(p => {
                 tbody.insertAdjacentHTML('beforeend', `
                     <tr>
                         <td>${p.nombre}</td>
@@ -368,9 +438,19 @@
         }
 
         function renderPagos() {
+            const query = document.getElementById("searchPagos") ? document.getElementById("searchPagos").value.toLowerCase() : "";
             const tbody = document.querySelector("#tablaPagos tbody");
             tbody.innerHTML = "";
-            pagos.forEach(p => {
+
+            const filtrados = pagos.filter(p => 
+                p.concepto.toLowerCase().includes(query) || 
+                p.proveedor.toLowerCase().includes(query) ||
+                p.forma.toLowerCase().includes(query) ||
+                p.estado.toLowerCase().includes(query) ||
+                p.fecha.includes(query)
+            );
+
+            filtrados.forEach(p => {
                 let claseEst = (p.estado === "Pagado") ? "status-paid" : "status-pending";
                 tbody.insertAdjacentHTML('beforeend', `
                     <tr>
@@ -391,9 +471,19 @@
         }
 
         function renderIngresos() {
+            const query = document.getElementById("searchIngresos") ? document.getElementById("searchIngresos").value.toLowerCase() : "";
             const tbody = document.querySelector("#tablaIngresos tbody");
             tbody.innerHTML = "";
-            ingresos.forEach(i => {
+
+            const filtrados = ingresos.filter(i => 
+                i.concepto.toLowerCase().includes(query) || 
+                i.cliente.toLowerCase().includes(query) ||
+                i.forma.toLowerCase().includes(query) ||
+                i.estado.toLowerCase().includes(query) ||
+                i.fecha.includes(query)
+            );
+
+            filtrados.forEach(i => {
                 let claseEst = (i.estado === "Cobrado") ? "status-paid" : "status-pending";
                 tbody.insertAdjacentHTML('beforeend', `
                     <tr>
@@ -459,7 +549,6 @@
                 let c = clientes.find(x => x.id === editId);
                 c.nombre = nom; c.telefono = tel;
             } else {
-                // CORRECCIÓN: 'telefono' en vez de 'telephone'
                 clientes.push({ id: Date.now(), nombre: nom, telefono: tel });
             }
             cerrarModal('modalCliente');
