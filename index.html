@@ -344,29 +344,15 @@
     </div>
 
     <script>
-        // --- MEJORA CRÍTICA: BASE DE DATOS LOCAL PERMANENTE (localStorage) ---
-        // Intenta cargar los datos previamente guardados. Si está vacío, usa los datos iniciales de ejemplo.
-        let clientes = JSON.parse(localStorage.getItem('db_clientes')) || [
-            { id: 1, nombre: "Juan Pérez", telefono: "+34 600 123 456" },
-            { id: 2, nombre: "María López", telefono: "+34 600 654 321" }
-        ];
-
-        let proveedores = JSON.parse(localStorage.getItem('db_proveedores')) || [
-            { id: 1, nombre: "Suministros Ofi S.L.", telefono: "+34 912 345 678", correo: "ventas@suministrosofi.es" },
-            { id: 2, nombre: "Iberdrola", telefono: "+34 900 225 235", correo: "empresas@iberdrola.es" }
-        ];
-
-        let pagos = JSON.parse(localStorage.getItem('db_pagos')) || [
-            { id: 1, fecha: "2026-06-10", proveedor: "Iberdrola", concepto: "Factura Luz", forma: "Transferencia", importe: 150.00, estado: "Pagado" }
-        ];
-
-        let ingresos = JSON.parse(localStorage.getItem('db_ingresos')) || [
-            { id: 1, fecha: "2026-06-01", cliente: "Juan Pérez", concepto: "Proyecto A", forma: "Bizum", importe: 1200.00, estado: "Cobrado" }
-        ];
+        // --- BASE DE DATOS INICIALIZADA TOTALMENTE VACÍA ---
+        let clientes = JSON.parse(localStorage.getItem('db_clientes')) || [];
+        let proveedores = JSON.parse(localStorage.getItem('db_proveedores')) || [];
+        let pagos = JSON.parse(localStorage.getItem('db_pagos')) || [];
+        let ingresos = JSON.parse(localStorage.getItem('db_ingresos')) || [];
 
         let editId = null;
 
-        // Función para sincronizar y guardar de forma segura en el disco duro del navegador
+        // Guarda de forma segura en el almacenamiento del navegador
         function guardarEnAlmacenamientoLocal() {
             localStorage.setItem('db_clientes', JSON.stringify(clientes));
             localStorage.setItem('db_proveedores', JSON.stringify(proveedores));
@@ -374,7 +360,7 @@
             localStorage.setItem('db_ingresos', JSON.stringify(ingresos));
         }
 
-        // --- SISTEMA DE PESTAÑAS BLINDADO ---
+        // --- SISTEMA DE PESTAÑAS ---
         function openTab(botonElemento, tabName) {
             var contenidos = document.getElementsByClassName("tab-content");
             for (var i = 0; i < contenidos.length; i++) { contenidos[i].style.display = "none"; }
@@ -656,93 +642,4 @@
                 let p = pagos.find(x => x.id === editId);
                 p.fecha = fecha; p.proveedor = prov; p.concepto = conc; p.forma = forma; p.importe = imp; p.estado = est;
             } else {
-                pagos.push({ id: Date.now(), fecha: fecha, proveedor: prov, concepto: conc, forma: forma, importe: imp, estado: est });
-            }
-            cerrarModal('modalPago');
-            guardarEnAlmacenamientoLocal();
-            renderPagos();
-        }
-
-        function eliminarPago(id) {
-            if(confirm("¿Estás seguro de eliminar este pago?")) {
-                pagos = pagos.filter(x => x.id !== id);
-                guardarEnAlmacenamientoLocal();
-                renderPagos();
-            }
-        }
-
-        function abrirModalIngreso(id) {
-            cargarOpcionesSelect(clientes, "selectIngresoCliente");
-            if(id && typeof id === 'number') {
-                editId = id;
-                let i = ingresos.find(x => x.id === id);
-                document.getElementById('inputIngresoFecha').value = i.fecha;
-                document.getElementById('selectIngresoCliente').value = i.cliente;
-                document.getElementById('inputIngresoConcepto').value = i.concepto;
-                document.getElementById('selectIngresoForma').value = i.forma;
-                document.getElementById('inputIngresoImporte').value = i.importe;
-                document.getElementById('selectIngresoEstado').value = i.estado;
-                document.getElementById('modalIngresoTitle').innerText = "Modificar Ingreso";
-                document.getElementById('btnGuardarIngreso').innerText = "Actualizar";
-            } else {
-                editId = null;
-                document.getElementById('inputIngresoFecha').valueAsDate = new Date();
-                document.getElementById('inputIngresoConcepto').value = "";
-                document.getElementById('inputIngresoImporte').value = "";
-                document.getElementById('modalIngresoTitle').innerText = "Registrar Ingreso";
-                document.getElementById('btnGuardarIngreso').innerText = "Guardar";
-            }
-            document.getElementById('modalIngreso').style.display = "block";
-        }
-
-        function guardarIngreso() {
-            var fecha = document.getElementById('inputIngresoFecha').value;
-            var cli = document.getElementById('selectIngresoCliente').value || "General";
-            var conc = document.getElementById('inputIngresoConcepto').value;
-            var forma = document.getElementById('selectIngresoForma').value;
-            var imp = document.getElementById('inputIngresoImporte').value;
-            var est = document.getElementById('selectIngresoEstado').value;
-
-            if (!fecha || !conc || !imp) return alert("Rellena todos los campos");
-
-            if(editId) {
-                let i = ingresos.find(x => x.id === editId);
-                i.fecha = fecha; i.cliente = cli; i.concepto = conc; i.forma = forma; i.importe = imp; i.estado = est;
-            } else {
-                ingresos.push({ id: Date.now(), fecha: fecha, cliente: cli, concepto: conc, forma: forma, importe: imp, estado: est });
-            }
-            cerrarModal('modalIngreso');
-            guardarEnAlmacenamientoLocal();
-            renderIngresos();
-        }
-
-        function eliminarIngreso(id) {
-            if(confirm("¿Estás seguro de eliminar este ingreso?")) {
-                ingresos = ingresos.filter(x => x.id !== id);
-                guardarEnAlmacenamientoLocal();
-                renderIngresos();
-            }
-        }
-
-        function exportarTodoAExcel() {
-            var wb = XLSX.utils.book_new();
-            
-            var dataCli = clientes.map(c => ({ "Nombre": c.nombre, "Teléfono": c.telefono }));
-            var dataProv = proveedores.map(p => ({ "Nombre / Empresa": p.nombre, "Teléfono": p.telefono, "Correo": p.correo }));
-            var dataPag = pagos.map(p => ({ "Fecha": p.fecha, "Concepto / Proveedor": `${p.concepto} - ${p.proveedor}`, "Forma de Pago": p.forma, "Importe (€)": parseFloat(p.importe), "Estado": p.estado }));
-            var dataIng = ingresos.map(i => ({ "Fecha": i.fecha, "Cliente / Concepto": `${i.cliente} - ${i.concepto}`, "Forma de Pago": i.forma, "Importe (€)": parseFloat(i.importe), "Estado": i.estado }));
-
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dataCli), "Clientes");
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dataProv), "Proveedores");
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dataPag), "Pagos");
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dataIng), "Ingresos");
-            
-            XLSX.writeFile(wb, "Gestion_de_Empresa.xlsx");
-        }
-
-        window.onload = function() {
-            renderAll();
-        };
-    </script>
-</body>
-</html>
+                pagos.push({ id: Date.now(), fecha: fecha, proveedor
