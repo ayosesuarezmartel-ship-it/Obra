@@ -83,7 +83,6 @@
         .tab-content { display: none; animation: fadeIn 0.5s; }
         @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
 
-        /* Contenedor con altura fija y scroll interno para proteger la estructura */
         .table-container {
             max-height: 420px; 
             overflow-y: auto;  
@@ -96,7 +95,6 @@
         table { width: 100%; border-collapse: collapse; margin-top: 0; }
         table th, table td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
         
-        /* Cabecera fija (Sticky) para no perder el orden */
         table th { 
             background-color: var(--primary-color); 
             color: white; 
@@ -107,19 +105,10 @@
         }
         table tr:hover { background-color: #f1f1f1; }
 
-        /* Barras de búsqueda */
-        .search-container {
-            margin-bottom: 15px;
-            width: 100%;
-        }
+        .search-container { margin-bottom: 15px; width: 100%; }
         .search-input {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-family: inherit;
-            font-size: 14px;
+            width: 100%; padding: 10px 12px; border: 1px solid #ccc; border-radius: 4px;
+            box-sizing: border-box; font-family: inherit; font-size: 14px;
         }
 
         .btn-action {
@@ -281,10 +270,7 @@
         <div class="modal-content">
             <h3 id="modalPagoTitle" style="color: #c0392b;">Registrar Pago</h3>
             <div class="form-group"><label>Fecha:</label><input type="date" id="inputPagoFecha"></div>
-            <div class="form-group">
-                <label>Proveedor:</label>
-                <select id="selectPagoProveedor"></select>
-            </div>
+            <div class="form-group"><label>Proveedor:</label><select id="selectPagoProveedor"></select></div>
             <div class="form-group"><label>Concepto:</label><input type="text" id="inputPagoConcepto"></div>
             <div class="form-group">
                 <label>Forma de Pago:</label>
@@ -314,10 +300,7 @@
         <div class="modal-content">
             <h3 id="modalIngresoTitle">Registrar Ingreso</h3>
             <div class="form-group"><label>Fecha:</label><input type="date" id="inputIngresoFecha"></div>
-            <div class="form-group">
-                <label>Cliente:</label>
-                <select id="selectIngresoCliente"></select>
-            </div>
+            <div class="form-group"><label>Cliente:</label><select id="selectIngresoCliente"></select></div>
             <div class="form-group"><label>Concepto:</label><input type="text" id="inputIngresoConcepto"></div>
             <div class="form-group">
                 <label>Forma de Pago:</label>
@@ -344,15 +327,37 @@
     </div>
 
     <script>
-        // --- BASE DE DATOS INICIALIZADA TOTALMENTE VACÍA ---
-        let clientes = JSON.parse(localStorage.getItem('db_clientes')) || [];
-        let proveedores = JSON.parse(localStorage.getItem('db_proveedores')) || [];
-        let pagos = JSON.parse(localStorage.getItem('db_pagos')) || [];
-        let ingresos = JSON.parse(localStorage.getItem('db_ingresos')) || [];
+        // --- PROTECCIÓN CRÍTICA DE MEMORIA (ANTI-CONGELAMIENTO) ---
+        let clientes = [];
+        let proveedores = [];
+        let pagos = [];
+        let ingresos = [];
 
+        function inicializarBaseDatos() {
+            try {
+                clientes = JSON.parse(localStorage.getItem('db_clientes'));
+                if (!Array.isArray(clientes)) clientes = [];
+            } catch(e) { clientes = []; }
+
+            try {
+                proveedores = JSON.parse(localStorage.getItem('db_proveedores'));
+                if (!Array.isArray(proveedores)) proveedores = [];
+            } catch(e) { proveedores = []; }
+
+            try {
+                pagos = JSON.parse(localStorage.getItem('db_pagos'));
+                if (!Array.isArray(pagos)) pagos = [];
+            } catch(e) { pagos = []; }
+
+            try {
+                ingresos = JSON.parse(localStorage.getItem('db_ingresos'));
+                if (!Array.isArray(ingresos)) ingresos = [];
+            } catch(e) { ingresos = []; }
+        }
+
+        inicializarBaseDatos();
         let editId = null;
 
-        // Guarda de forma segura en el almacenamiento del navegador
         function guardarEnAlmacenamientoLocal() {
             localStorage.setItem('db_clientes', JSON.stringify(clientes));
             localStorage.setItem('db_proveedores', JSON.stringify(proveedores));
@@ -366,8 +371,10 @@
             for (var i = 0; i < contenidos.length; i++) { contenidos[i].style.display = "none"; }
             var botones = document.getElementsByClassName("tab-links");
             for (var i = 0; i < botones.length; i++) { botones[i].classList.remove("active"); }
-            document.getElementById(tabName).style.display = "block";
-            botonElemento.classList.add("active");
+            
+            var targetTab = document.getElementById(tabName);
+            if(targetTab) targetTab.style.display = "block";
+            if(botonElemento) botonElemento.classList.add("active");
         }
 
         function renderAll() {
@@ -377,22 +384,23 @@
             renderIngresos();
         }
 
-        // --- RENDERS CON FILTRADO EN TIEMPO REAL ---
+        // --- RENDERS PROTEGIDOS CONTRA CAMPOS NULOS ---
         function renderClientes() {
             const query = document.getElementById("searchClientes") ? document.getElementById("searchClientes").value.toLowerCase() : "";
             const tbody = document.querySelector("#tablaClientes tbody");
+            if(!tbody) return;
             tbody.innerHTML = "";
             
             const filtrados = clientes.filter(c => 
-                c.nombre.toLowerCase().includes(query) || 
-                c.telefono.toLowerCase().includes(query)
+                (c.nombre || "").toLowerCase().includes(query) || 
+                (c.telefono || "").toLowerCase().includes(query)
             );
 
             filtrados.forEach(c => {
                 tbody.insertAdjacentHTML('beforeend', `
                     <tr>
-                        <td>${c.nombre}</td>
-                        <td>${c.telefono}</td>
+                        <td>${c.nombre || ''}</td>
+                        <td>${c.telefono || ''}</td>
                         <td>
                             <button class="btn-action btn-edit" onclick="abrirModalCliente(${c.id})">✏️</button>
                             <button class="btn-action btn-delete" onclick="eliminarCliente(${c.id})">❌</button>
@@ -407,20 +415,21 @@
         function renderProveedores() {
             const query = document.getElementById("searchProveedores") ? document.getElementById("searchProveedores").value.toLowerCase() : "";
             const tbody = document.querySelector("#tablaProveedores tbody");
+            if(!tbody) return;
             tbody.innerHTML = "";
 
             const filtrados = proveedores.filter(p => 
-                p.nombre.toLowerCase().includes(query) || 
-                p.telefono.toLowerCase().includes(query) ||
-                p.correo.toLowerCase().includes(query)
+                (p.nombre || "").toLowerCase().includes(query) || 
+                (p.telefono || "").toLowerCase().includes(query) ||
+                (p.correo || "").toLowerCase().includes(query)
             );
 
             filtrados.forEach(p => {
                 tbody.insertAdjacentHTML('beforeend', `
                     <tr>
-                        <td>${p.nombre}</td>
-                        <td>${p.telefono}</td>
-                        <td>${p.correo}</td>
+                        <td>${p.nombre || ''}</td>
+                        <td>${p.telefono || ''}</td>
+                        <td>${p.correo || ''}</td>
                         <td>
                             <button class="btn-action btn-edit" onclick="abrirModalProveedor(${p.id})">✏️</button>
                             <button class="btn-action btn-delete" onclick="eliminarProveedor(${p.id})">❌</button>
@@ -435,25 +444,28 @@
         function renderPagos() {
             const query = document.getElementById("searchPagos") ? document.getElementById("searchPagos").value.toLowerCase() : "";
             const tbody = document.querySelector("#tablaPagos tbody");
+            if(!tbody) return;
             tbody.innerHTML = "";
 
             const filtrados = pagos.filter(p => 
-                p.concepto.toLowerCase().includes(query) || 
-                p.proveedor.toLowerCase().includes(query) ||
-                p.forma.toLowerCase().includes(query) ||
-                p.estado.toLowerCase().includes(query) ||
-                p.fecha.includes(query)
+                (p.concepto || "").toLowerCase().includes(query) || 
+                (p.proveedor || "").toLowerCase().includes(query) ||
+                (p.forma || "").toLowerCase().includes(query) ||
+                (p.estado || "").toLowerCase().includes(query) ||
+                (p.fecha || "").includes(query)
             );
 
             filtrados.forEach(p => {
                 let claseEst = (p.estado === "Pagado") ? "status-paid" : "status-pending";
+                let impVal = parseFloat(p.importe);
+                let impStr = isNaN(impVal) ? "0.00" : impVal.toFixed(2);
                 tbody.insertAdjacentHTML('beforeend', `
                     <tr>
-                        <td>${p.fecha}</td>
-                        <td>${p.concepto} - ${p.proveedor}</td>
-                        <td>${p.forma}</td>
-                        <td>${parseFloat(p.importe).toFixed(2)} €</td>
-                        <td class="${claseEst}">${p.estado}</td>
+                        <td>${p.fecha || ''}</td>
+                        <td>${p.concepto || ''} - ${p.proveedor || ''}</td>
+                        <td>${p.forma || ''}</td>
+                        <td>${impStr} €</td>
+                        <td class="${claseEst}">${p.estado || ''}</td>
                         <td>
                             <button class="btn-action btn-edit" onclick="abrirModalPago(${p.id})">✏️</button>
                             <button class="btn-action btn-delete" onclick="eliminarPago(${p.id})">❌</button>
@@ -468,25 +480,28 @@
         function renderIngresos() {
             const query = document.getElementById("searchIngresos") ? document.getElementById("searchIngresos").value.toLowerCase() : "";
             const tbody = document.querySelector("#tablaIngresos tbody");
+            if(!tbody) return;
             tbody.innerHTML = "";
 
             const filtrados = ingresos.filter(i => 
-                i.concepto.toLowerCase().includes(query) || 
-                i.cliente.toLowerCase().includes(query) ||
-                i.forma.toLowerCase().includes(query) ||
-                i.estado.toLowerCase().includes(query) ||
-                i.fecha.includes(query)
+                (i.concepto || "").toLowerCase().includes(query) || 
+                (i.cliente || "").toLowerCase().includes(query) ||
+                (i.forma || "").toLowerCase().includes(query) ||
+                (i.estado || "").toLowerCase().includes(query) ||
+                (i.fecha || "").includes(query)
             );
 
             filtrados.forEach(i => {
                 let claseEst = (i.estado === "Cobrado") ? "status-paid" : "status-pending";
+                let impVal = parseFloat(i.importe);
+                let impStr = isNaN(impVal) ? "0.00" : impVal.toFixed(2);
                 tbody.insertAdjacentHTML('beforeend', `
                     <tr>
-                        <td>${i.fecha}</td>
-                        <td>${i.cliente} - ${i.concepto}</td>
-                        <td>${i.forma}</td>
-                        <td>${parseFloat(i.importe).toFixed(2)} €</td>
-                        <td class="${claseEst}">${i.estado}</td>
+                        <td>${i.fecha || ''}</td>
+                        <td>${i.cliente || ''} - ${i.concepto || ''}</td>
+                        <td>${i.forma || ''}</td>
+                        <td>${impStr} €</td>
+                        <td class="${claseEst}">${i.estado || ''}</td>
                         <td>
                             <button class="btn-action btn-edit" onclick="abrirModalIngreso(${i.id})">✏️</button>
                             <button class="btn-action btn-delete" onclick="eliminarIngreso(${i.id})">❌</button>
@@ -500,6 +515,7 @@
 
         function cargarOpcionesSelect(origenDatos, idSelect) {
             var select = document.getElementById(idSelect);
+            if(!select) return;
             select.innerHTML = "";
             
             var optDefault = document.createElement("option");
@@ -508,21 +524,29 @@
             select.appendChild(optDefault);
 
             origenDatos.forEach(function(item) {
-                var opcion = document.createElement("option");
-                opcion.value = item.nombre;
-                opcion.text = item.nombre;
-                select.appendChild(opcion);
+                if(item && item.nombre) {
+                    var opcion = document.createElement("option");
+                    opcion.value = item.nombre;
+                    opcion.text = item.nombre;
+                    select.appendChild(opcion);
+                }
             });
         }
 
-        function cerrarModal(id) { document.getElementById(id).style.display = "none"; editId = null; }
+        function cerrarModal(id) { 
+            let target = document.getElementById(id);
+            if(target) target.style.display = "none"; 
+            editId = null; 
+        }
 
         function abrirModalCliente(id) {
             if(id && typeof id === 'number') {
                 editId = id;
                 let c = clientes.find(x => x.id === id);
-                document.getElementById('inputCliNombre').value = c.nombre;
-                document.getElementById('inputCliTel').value = c.telefono;
+                if(c) {
+                    document.getElementById('inputCliNombre').value = c.nombre || "";
+                    document.getElementById('inputCliTel').value = c.telefono || "";
+                }
                 document.getElementById('modalClienteTitle').innerText = "Modificar Cliente";
                 document.getElementById('btnGuardarCliente').innerText = "Actualizar";
             } else {
@@ -542,7 +566,7 @@
             
             if(editId) {
                 let c = clientes.find(x => x.id === editId);
-                c.nombre = nom; c.telefono = tel;
+                if(c) { c.nombre = nom; c.telefono = tel; }
             } else {
                 clientes.push({ id: Date.now(), nombre: nom, telefono: tel });
             }
@@ -563,9 +587,11 @@
             if(id && typeof id === 'number') {
                 editId = id;
                 let p = proveedores.find(x => x.id === id);
-                document.getElementById('inputProvNombre').value = p.nombre;
-                document.getElementById('inputProvTel').value = p.telefono;
-                document.getElementById('inputProvEmail').value = p.correo;
+                if(p) {
+                    document.getElementById('inputProvNombre').value = p.nombre || "";
+                    document.getElementById('inputProvTel').value = p.telefono || "";
+                    document.getElementById('inputProvEmail').value = p.correo || "";
+                }
                 document.getElementById('modalProveedorTitle').innerText = "Modificar Proveedor";
                 document.getElementById('btnGuardarProveedor').innerText = "Actualizar";
             } else {
@@ -587,7 +613,7 @@
             
             if(editId) {
                 let p = proveedores.find(x => x.id === editId);
-                p.nombre = nom; p.telefono = tel; p.correo = email;
+                if(p) { p.nombre = nom; p.telefono = tel; p.correo = email; }
             } else {
                 proveedores.push({ id: Date.now(), nombre: nom, telefono: tel, correo: email });
             }
@@ -609,12 +635,14 @@
             if(id && typeof id === 'number') {
                 editId = id;
                 let p = pagos.find(x => x.id === id);
-                document.getElementById('inputPagoFecha').value = p.fecha;
-                document.getElementById('selectPagoProveedor').value = p.proveedor;
-                document.getElementById('inputPagoConcepto').value = p.concepto;
-                document.getElementById('selectPagoForma').value = p.forma;
-                document.getElementById('inputPagoImporte').value = p.importe;
-                document.getElementById('selectPagoEstado').value = p.estado;
+                if(p) {
+                    document.getElementById('inputPagoFecha').value = p.fecha || "";
+                    document.getElementById('selectPagoProveedor').value = p.proveedor || "General";
+                    document.getElementById('inputPagoConcepto').value = p.concepto || "";
+                    document.getElementById('selectPagoForma').value = p.forma || "Tarjeta";
+                    document.getElementById('inputPagoImporte').value = p.importe || "";
+                    document.getElementById('selectPagoEstado').value = p.estado || "Pagado";
+                }
                 document.getElementById('modalPagoTitle').innerText = "Modificar Pago";
                 document.getElementById('btnGuardarPago').innerText = "Actualizar";
             } else {
@@ -640,6 +668,97 @@
 
             if(editId) {
                 let p = pagos.find(x => x.id === editId);
-                p.fecha = fecha; p.proveedor = prov; p.concepto = conc; p.forma = forma; p.importe = imp; p.estado = est;
+                if(p) { p.fecha = fecha; p.proveedor = prov; p.concepto = conc; p.forma = forma; p.importe = imp; p.estado = est; }
             } else {
-                pagos.push({ id: Date.now(), fecha: fecha, proveedor
+                pagos.push({ id: Date.now(), fecha: fecha, proveedor: prov, concepto: conc, forma: forma, importe: imp, estado: est });
+            }
+            cerrarModal('modalPago');
+            guardarEnAlmacenamientoLocal();
+            renderPagos();
+        }
+
+        function eliminarPago(id) {
+            if(confirm("¿Estás seguro de eliminar este pago?")) {
+                pagos = pagos.filter(x => x.id !== id);
+                guardarEnAlmacenamientoLocal();
+                renderPagos();
+            }
+        }
+
+        function abrirModalIngreso(id) {
+            cargarOpcionesSelect(clientes, "selectIngresoCliente");
+            if(id && typeof id === 'number') {
+                editId = id;
+                let i = ingresos.find(x => x.id === id);
+                if(i) {
+                    document.getElementById('inputIngresoFecha').value = i.fecha || "";
+                    document.getElementById('selectIngresoCliente').value = i.cliente || "General";
+                    document.getElementById('inputIngresoConcepto').value = i.concepto || "";
+                    document.getElementById('selectIngresoForma').value = i.forma || "Tarjeta";
+                    document.getElementById('inputIngresoImporte').value = i.importe || "";
+                    document.getElementById('selectIngresoEstado').value = i.estado || "Cobrado";
+                }
+                document.getElementById('modalIngresoTitle').innerText = "Modificar Ingreso";
+                document.getElementById('btnGuardarIngreso').innerText = "Actualizar";
+            } else {
+                editId = null;
+                document.getElementById('inputIngresoFecha').valueAsDate = new Date();
+                document.getElementById('inputIngresoConcepto').value = "";
+                document.getElementById('inputIngresoImporte').value = "";
+                document.getElementById('modalIngresoTitle').innerText = "Registrar Ingreso";
+                document.getElementById('btnGuardarIngreso').innerText = "Guardar";
+            }
+            document.getElementById('modalIngreso').style.display = "block";
+        }
+
+        function guardarIngreso() {
+            var fecha = document.getElementById('inputIngresoFecha').value;
+            var cli = document.getElementById('selectIngresoCliente').value || "General";
+            var conc = document.getElementById('inputIngresoConcepto').value;
+            var forma = document.getElementById('selectIngresoForma').value;
+            var imp = document.getElementById('inputIngresoImporte').value;
+            var est = document.getElementById('selectIngresoEstado').value;
+
+            if (!fecha || !conc || !imp) return alert("Rellena todos los campos");
+
+            if(editId) {
+                let i = ingresos.find(x => x.id === editId);
+                if(i) { i.fecha = fecha; i.cliente = cli; i.concepto = conc; i.forma = forma; i.importe = imp; i.estado = est; }
+            } else {
+                ingresos.push({ id: Date.now(), fecha: fecha, cliente: cli, concepto: conc, forma: forma, importe: imp, estado: est });
+            }
+            cerrarModal('modalIngreso');
+            guardarEnAlmacenamientoLocal();
+            renderIngresos();
+        }
+
+        function eliminarIngreso(id) {
+            if(confirm("¿Estás seguro de eliminar este ingreso?")) {
+                ingresos = ingresos.filter(x => x.id !== id);
+                guardarEnAlmacenamientoLocal();
+                renderIngresos();
+            }
+        }
+
+        function exportarTodoAExcel() {
+            var wb = XLSX.utils.book_new();
+            
+            var dataCli = clientes.map(c => ({ "Nombre": c.nombre || "", "Teléfono": c.telefono || "" }));
+            var dataProv = proveedores.map(p => ({ "Nombre / Empresa": p.nombre || "", "Teléfono": p.telefono || "", "Correo": p.correo || "" }));
+            var dataPag = pagos.map(p => ({ "Fecha": p.fecha || "", "Concepto / Proveedor": `${p.concepto || ''} - ${p.proveedor || ''}`, "Forma de Pago": p.forma || "", "Importe (€)": parseFloat(p.importe) || 0, "Estado": p.estado || "" }));
+            var dataIng = ingresos.map(i => ({ "Fecha": i.fecha || "", "Cliente / Concepto": `${i.cliente || ''} - ${i.concepto || ''}`, "Forma de Pago": i.forma || "", "Importe (€)": parseFloat(i.importe) || 0, "Estado": i.estado || "" }));
+
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dataCli), "Clientes");
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dataProv), "Proveedores");
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dataPag), "Pagos");
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dataIng), "Ingresos");
+            
+            XLSX.writeFile(wb, "Gestion_de_Empresa.xlsx");
+        }
+
+        window.onload = function() {
+            renderAll();
+        };
+    </script>
+</body>
+</html>
