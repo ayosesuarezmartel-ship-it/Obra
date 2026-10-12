@@ -1,0 +1,14 @@
+APP GUACIMARA BOLAÑOS - INSTALACIÓN
+
+1) Sube TODA esta carpeta a un alojamiento web con HTTPS (obligatorio para que se pueda instalar):
+   - Netlify Drop (netlify.com/drop): arrastra la carpeta y te da una dirección.
+   - o Cloudflare Pages / GitHub Pages.
+2) Abre esa dirección en el móvil:
+   - Android (Chrome): menú ⋮ > "Instalar aplicación".
+   - iPhone (Safari): botón Compartir > "Añadir a pantalla de inicio".
+3) La app empieza vacía. Para cargar tus datos, entra en Clientes, Proveedores, Servicios o Productos
+   y pulsa "Importar de Excel": eliges el archivo, compruebas las columnas y pulsas Importar.
+   (Sirve .xlsx, .xls y .csv.)
+
+Los datos se guardan solo en el dispositivo donde instales la app. Haz copias de seguridad a menudo
+(Resumen > Descargar copia). No subas a la web archivos con datos de clientes.
